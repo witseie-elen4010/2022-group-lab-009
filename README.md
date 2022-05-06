@@ -1,11 +1,11 @@
 Wordle too
 
-Ivan Von Staden - 1838664
+Ivan Von Staden 
 
-Devlan Mckenzie - 1876492
+Devlan Mckenzie 
 
-Zhuofeng Wu - 1844044
+Zhuofeng Wu 
 
-Jesse Iyuke - 1606965
+Jesse Iyuke 
 
-Njeru Ndegwa - 1754227
+Njeru Ndegwa 
