@@ -72,6 +72,10 @@ describe('Able to see status of lobby', function () {
     });
 })
 
+afterAll(() => {
+    app.close();
+ })
+
 
 
 

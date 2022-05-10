@@ -18,8 +18,10 @@ app.use('/Auth',authRoutes)
 app.set('view engine', 'html');
 app.engine('html', require('ejs').renderFile);
 
-app.listen(port, () => {
+var server = app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })
 
-module.exports = app;
+
+
+module.exports = server;
