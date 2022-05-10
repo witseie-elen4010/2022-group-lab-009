@@ -4,14 +4,6 @@ const express = require("express");
 const app = require("../index")
 
 
-
-  describe('Home Route', function () {
-    test('responds to /', async () => {
-      const res = await request(app).get('/');
-      expect(res.statusCode).toBe(200);
-    });
-})
-
 describe('testing adding connection', function () {
     test('responds to /Auth/AddNewConnection', async () => {
       const res = await request(app).post('/Auth/AddNewConnection').send({playerName: "Ivan", UID: "200002"});
@@ -48,7 +40,6 @@ describe('Able to return players', function () {
     test('responds to /Auth/ReturnPlayers', async () => {
       const res = await request(app).get('/Auth/ReturnPlayers')
       expect(res.statusCode).toBe(200);
-      console.log(res)
       expect(res.body).toStrictEqual([{"UID": "200002", "playerName": "Ivan"}])
     });
 })
