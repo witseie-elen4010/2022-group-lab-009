@@ -8,7 +8,6 @@ const app = require("../index")
   describe('Home Route', function () {
     test('responds to /', async () => {
       const res = await request(app).get('/');
-      expect(res.header['content-type']).toBe('text/html; charset=UTF-8');
       expect(res.statusCode).toBe(200);
     });
 })
