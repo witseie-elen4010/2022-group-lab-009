@@ -49,6 +49,40 @@ body {
   text-transform: uppercase;
 }
 
+.flipping {
+  animation: flip 0.5s ease;
+}
+
+@keyframes flip {
+  0% {
+    transform: scaleY(1);
+  }
+  50% {
+    transform: scaleY(0);
+  }
+  100% {
+    transform: scaleY(1);
+  }
+}
+
 #key-container {
   height: 200px;
+}
+
+.row {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin: 0 auto 5px;
+  touch-action: manipulation;
+}
+
+.row button {
+  height: 60px;
+  width: 50px;
+  cursor: pointer;
+  background-color:dimgray;
+  color: white;
+  margin-right: 5px;
+  text-transform: uppercase;
 }
