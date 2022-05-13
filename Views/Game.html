@@ -1,16 +1,67 @@
-<!DOCTYPE html>
-<html>
-<head>
-<title>Page Title</title>
 
+</html> 
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="../main.css">
+
+    <title>Wordle Gamer!</title>
+    <!-- defer means that the JS code is executed after the DOM is fully built -->
+    
 </head>
 <body>
-<h1>In-Game</h1>
-    
+    <div id="game_container">
+        <header>
+            <h1 class="name">Wordle</h1>           
+        </header>
+        <div id="grid_container">
+            <div id="grid"></div>
+        </div>
 
-        
-    
-
+        <div id="key-container">
+            <div class="row">
+                <button data-key="Q">Q</button>
+                <button data-key="W">W</button>
+                <button data-key="E">E</button>
+                <button data-key="R">R</button>
+                <button data-key="T">T</button>
+                <button data-key="Y">Y</button>
+                <button data-key="U">U</button>
+                <button data-key="I">I</button>
+                <button data-key="O">O</button>
+                <button data-key="P">P</button>
+            </div>
+            <div class="row">
+                <div class="space"></div>
+                <button data-key="A">A</button>
+                <button data-key="S">S</button>
+                <button data-key="D">D</button>
+                <button data-key="F">F</button>
+                <button data-key="G">G</button>
+                <button data-key="H">H</button>
+                <button data-key="J">J</button>
+                <button data-key="K">K</button>
+                <button data-key="L">L</button>
+                <div class="space"></div>
+            </div>
+            <div class="row"> 
+                <button data-key="Enter" class="key large">Enter</button>
+                <button data-key="Z">Z</button>
+                <button data-key="X">X</button>
+                <button data-key="C">C</button>
+                <button data-key="V">V</button>
+                <button data-key="B">B</button>
+                <button data-key="N">N</button>
+                <button data-key="M">M</button>
+                <button data-key="Delete" class="key large">Del</button> 
+            </div>
+        </div>
+    </div>
 </body>
-<script src="../Game.js"></script>
-</html> 
+    <script src="../Game.js"></script>
+</html>

@@ -20,6 +20,15 @@ describe('Good Home Routes', function () {
     });
 })
 
+describe('Able to generate UID', function () {
+  test('responds to /Auth/GenerateNewUID', async () => {
+    const res = await request(app).post('/Auth/GenerateNewUID').send({playerName: "Ivan"});
+    expect(res.statusCode).toBe(200);
+    console.log(res)
+    expect(res.body).toBe('2291258')
+  });
+})
+
 describe('Good ACK', function () {
     test('responds to /Auth/ACK', async () => {
       const res = await request(app).post('/Auth/ACK').send({playerName: "Ivan", UID: "200002"})
@@ -61,6 +70,8 @@ describe('Able to see status of lobby', function () {
       expect(res.body).toBe("/waiting")
     });
 })
+
+
 
 afterAll(() => {
     app.close();
