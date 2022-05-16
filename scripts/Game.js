@@ -1,7 +1,11 @@
 
+'use strict'
 let WindowId = setInterval(update, 1000)
+let playerList = []
+let testWord = "PANIC"
 window.addEventListener("beforeunload",function(){
       Dequeue();
+      CloseSync();
 })
 
 window.addEventListener('load', (event) => {
@@ -9,13 +13,12 @@ window.addEventListener('load', (event) => {
   GetACK();
 });
 
-let playerList = []
-let testWord = "PANIC"
 
 
 
 function update(){
   GameStatus();
+  GetSyncData();
 }
 
 function CheckForReload(){
@@ -23,6 +26,7 @@ function CheckForReload(){
   console.log(data);
     if (data === "reload") {
       Dequeue();
+      CloseSync();
     } 
 }
 
@@ -85,6 +89,12 @@ async function Dequeue(){
   });
 }
 
+async function CloseSync(){
+  fetch('Game/CloseSync').then((data) => {
+      console.log(data);
+  })
+}
+
 async function SetupOppBoard(){
   fetch('/Auth/ReturnPlayers').then((data) => {
       return data.json()
@@ -120,32 +130,94 @@ async function SetupOppBoard(){
     
   }
 
-///Game Functionality section
-'use strict'
-document.addEventListener('DOMContentLoaded', () => {
-  gridSystem()
+  async function SyncData(data){
 
-  const letter = document.querySelectorAll('.row input')
 
-  for (let index = 0; index < letter.length; index++) {
-    letter[index].onclick = ({ target }) => {
-      const element = target.getAttribute('value')
-      // check input key
-      // if entry isnt 5 letters
-      if (element === 'Enter') {
-        submit()
-        return
-      }
-      // delete key
-      if (element === 'Delete') {
-        deleteKey()
-        return
-      }
-      console.log(element)
-      WordUpdate(element)
+        fetch("/Game/Sync", {
+        method: "post",
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            UID: sessionStorage.getItem("UID"),
+            Data: data
+        })
+      })
+      .then( (response) => { 
+          console.log(response)
+      });
+  
     
-    }
   }
+
+  async function GetSyncData(){
+    let temp = [];
+    fetch('Game/GetSync').then(data => data.json()).then((data)=>{
+      temp = data;
+      temp = temp.filter(element =>{
+          if(element.UID != sessionStorage.getItem("UID")){
+            return element;
+          }
+      })
+      console.log("Sync'd data: ",temp)
+      console.log("Our interest Syncs: ",temp.length)
+      while(temp.length > 0){
+          let tempPlayer = temp[0].UID
+          console.log("Current PlayerID: ",tempPlayer)
+          let PlayerMoves = temp.filter(element =>{
+            if(element.UID == tempPlayer){
+              return element;
+            }
+          })
+          temp = temp.filter(element =>{
+            if(element.UID != tempPlayer){
+              return element
+            }
+          })
+        let container = document.getElementById(tempPlayer)
+        PlayerMoves.forEach((data) =>{
+          let slot = data.Moves.idLetter;
+          let Color = data.Moves.gridColour;
+          let children = Array.from(container.children)
+          console.log("children: ",children)
+          children.forEach(element =>{
+            console.log("We have ID:",element.id)
+            if(element.id == slot.toString()){
+              element.style = `background-color:${Color}`
+            }
+          })
+          
+        })
+      }
+    })
+  }
+
+
+///Game Functionality section
+  document.addEventListener('DOMContentLoaded', () => {
+    gridSystem()
+    const keys = document.querySelectorAll('.row button')
+    for (let index = 0; index < keys.length; index++) {
+      keys[index].onclick = ({target}) => {
+        const key = target.getAttribute("data-key")
+          // if entry isnt 5 letters
+          if (key === 'Enter') {
+            submit()
+            return
+          }
+    
+          // delete key
+          if (key === 'Delete') {
+            deleteKey()
+            return
+          }
+  
+        console.log(key)
+        WordUpdate(key)
+      }
+    }
+  })
 
   // key input functions
 
@@ -173,75 +245,75 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  function submit () {
+
+ 
+  // creates a grid system 
+  function gridSystem () {
+    const gameBoard = document.getElementById('grid')
+    for (let i = 0; i < 30; i++) {
+      const grid = document.createElement('div')
+      grid.classList.add('square')
+      grid.classList.add('flipping')
+      grid.setAttribute('id', i + 1) // index starts at one not 0
+      gameBoard.appendChild(grid)
+    }
+    SetupOppBoard();
+
+  }
+
+  async function submit () {
     const currentArr = currentWord()
-    if (currentArr.length < 5) {
-      window.alert('its not 5 letters')
-    } else {
-      const current = currentArr.join('')
-      console.log(current.toLowerCase())
+    if (currentArr.length !== 5) {
+      window.alert('5 letters')
+    }
+    const current = currentArr.join('')
+    console.log(current.toLowerCase())
 
-      // check real world
-      // dictionary is handled by database
-     /*  if (!WooldeWords.includes(current.toLowerCase())) {
-        window.alert('not real word')
-        deleteKey()
-        deleteKey()
-        deleteKey()
-        deleteKey()
-        deleteKey()
-      } */ 
-        // game won
-        if (current === testWord) {
-          window.alert('noice')
-        }
-        // check if game won
-        //  && current !== testWord
-        if (words.length === 6) {
-          window.alert('its chaii')
-          window.alert(`Word of the day: ${testWord}`)
-        }
+    //HERE NEEDS TO BE UNCOMMENTED ONCE ZHUO HAS DATABASE HOOKS
+    // check real world
+    //if (!WooldeWords.includes(current.toLowerCase())) {
+    //  window.alert('not real word')
+    //}
 
-        // turn over tiles
-        const idCount = count * 5 + 1
-        const timer = 300
-        currentArr.forEach((element, i) => {
-          setTimeout(() => {
-            const gridColour = gridColourFunc(element, i)
-            const idLetter = idCount + i
-            const elementLetter = document.getElementById(idLetter)
-            elementLetter.classList.add('animate__flipInX')
-            elementLetter.style = `background-color:${gridColour}`
-          }, timer * i) // extend interval in each letter
-        })
+    // game won
+    if (current === testWord) {
+      window.alert('noice')
+    }
+    // check if game won
+    //  && current !== testWord
+    if (words.length === 6) {
+      window.alert('its chaii')
+      window.alert(`Word of the day: ${testWord}`)
+    }
 
-        count += 1
-
-        // next row
-        words.push([])
+    // turn over tiles
+    const idCount = count * 5 + 1
+    const timer = 300
+    let Data = new Array()
+    currentArr.forEach((element, i) => {
+     setTimeout(() => {
+        
+        const gridColour = gridColourFunc(element, i)
+        const idLetter = idCount + i
+        const elementLetter = document.getElementById(idLetter)
+        elementLetter.classList.add('animate__flipInX')
+        elementLetter.style = `background-color:${gridColour}`
+        let temp = {idLetter: idLetter, gridColour: gridColour}
+        Data.push(temp);
+      }, timer * i) // extend interval in each letter
       
-    }
+    })
+    await delay(1.5)
+    count += 1
+    // next row
+    words.push([])
+    console.log("What we passing to sync: ", Data)
+    console.log("After String: ", JSON.stringify(Data))
+    SyncData(Data);
   }
 
-  function deleteKey () {
-    const currentArr = currentWord()
-    if (currentArr.length > 0) {
-      const deleteElement = currentArr.pop() // remove letter
-      console.log(deleteElement)
-
-      words[words.length - 1] = currentArr
-
-      const lastElement = document.getElementById(String(space - 1))
-
-      lastElement.textContent = ''
-      space = space - 1
-    }
-  }
-
-  
-
-   // change grid colours
-   function gridColourFunc (element, i) {
+  // change grid colours
+  function gridColourFunc (element, i) {
     const rightElement = testWord.includes(element)
 
     if (!rightElement) {
@@ -258,22 +330,24 @@ document.addEventListener('DOMContentLoaded', () => {
     return 'rgb(181, 159, 59)'
   }
 
+  function deleteKey () {
+    const currentArr = currentWord()
+    const deleteElement = currentArr.pop() // remove letter
+    console.log(deleteElement)
 
- 
-  // creates a grid system 
-  function gridSystem () {
-    const gameBoard = document.getElementById('grid')
-    for (let i = 0; i < 30; i++) {
-      const grid = document.createElement('div')
-      grid.classList.add('square')
-      grid.classList.add('flipping')
-      grid.setAttribute('id', i + 1) // index starts at one not 0
-      gameBoard.appendChild(grid)
-      
-    }
-    SetupOppBoard();
+    words[words.length - 1] = currentArr
 
+    const lastElement = document.getElementById(String(space - 1))
+
+    lastElement.textContent = ''
+    space = space - 1
   }
 
-})
+  function delay(n){
+    return new Promise(function(resolve){
+        setTimeout(resolve,n*1000);
+    });
+}
+
+
 
