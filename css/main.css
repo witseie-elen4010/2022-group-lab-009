@@ -86,3 +86,21 @@ body {
   margin-right: 5px;
   text-transform: uppercase;
 }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-gap: 5px;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.playerGridStyle {
+  float: inline-start;
+}
+
+.playerTitle {
+  color: crimson;
+  justify-content: center;
+  align-items: center;
+}

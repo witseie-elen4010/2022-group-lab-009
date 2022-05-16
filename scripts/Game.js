@@ -9,6 +9,7 @@ window.addEventListener('load', (event) => {
   GetACK();
 });
 
+let playerList = []
 let testWord = "PANIC"
 
 
@@ -83,6 +84,41 @@ async function Dequeue(){
       console.log("Logged out of Authentication Server")
   });
 }
+
+async function SetupOppBoard(){
+  fetch('/Auth/ReturnPlayers').then((data) => {
+      return data.json()
+  }).then((data)=>{
+      playerList = data;
+      playerList = playerList.filter((data) =>{
+          if(data.UID != sessionStorage.getItem("UID")){
+              return data;
+          }
+      })
+      console.log("playerList: ",playerList)
+      const opponentBoard = document.getElementById('playersGrid')
+      playerList.forEach(data => {
+        const container = document.createElement('div')
+        container.setAttribute('id', data.UID)
+        container.setAttribute('class','grid playerGridStyle')
+        const heading = document.createElement('h2')
+        heading.innerHTML = data.playerName;
+        heading.setAttribute('class','playerTitle')
+        opponentBoard.appendChild(heading)
+        console.log("x value: ", data)
+        for (let i = 0; i < 30; i++) {
+          const grid = document.createElement('div')
+          grid.classList.add('square')
+          grid.classList.add('flipping')
+          grid.setAttribute('id', i + 1) // index starts at one not 0
+          container.appendChild(grid)
+            }
+        opponentBoard.appendChild(container)
+        
+      });   
+    })
+    
+  }
 
 ///Game Functionality section
 'use strict'
@@ -202,6 +238,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  
+
    // change grid colours
    function gridColourFunc (element, i) {
     const rightElement = testWord.includes(element)
@@ -231,7 +269,10 @@ document.addEventListener('DOMContentLoaded', () => {
       grid.classList.add('flipping')
       grid.setAttribute('id', i + 1) // index starts at one not 0
       gameBoard.appendChild(grid)
+      
     }
+    SetupOppBoard();
+
   }
 
 })
