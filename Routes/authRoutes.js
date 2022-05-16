@@ -1,3 +1,5 @@
+
+const UIDlib = require("../scripts/HashGen")
 const path = require('path')
 const express = require('express')
 const authRoutes = express.Router()
@@ -40,6 +42,25 @@ authRoutes.post('/AddNewConnection',function (req, res) {
     console.log("Current Queue: ")
     console.log(AuthList)
     res.redirect('/Queue')
+})
+
+authRoutes.post('/GenerateNewUID',function (req, res) {
+    console.log('Creating an UID for the following Player:', req.body.playerName)
+    let UID = UIDlib.GenerateUniqueHash(req.body.playerName)
+    let reponse_ = ""
+    console.log("current Auth List: ", AuthList)
+    AuthList.forEach(data =>{
+        console.log("Data: ", data)
+        if(data.UID == UID){
+            console.log("Yoo name in use")
+            reponse_ = "FAILED"
+        }
+    })
+    if(reponse_ != "FAILED"){
+        console.log("Passed UID check")
+        reponse_ = UID.toString()
+    }
+    res.json(reponse_)
 })
 
 authRoutes.get("/LobbyOpen", function (req, res) {
