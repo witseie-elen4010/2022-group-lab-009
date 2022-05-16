@@ -89,11 +89,11 @@ async function Dequeue(){
 document.addEventListener('DOMContentLoaded', () => {
   gridSystem()
 
-  const letter = document.querySelectorAll('.row button')
+  const letter = document.querySelectorAll('.row input')
 
   for (let index = 0; index < letter.length; index++) {
     letter[index].onclick = ({ target }) => {
-      const element = target.getAttribute('data-key')
+      const element = target.getAttribute('value')
       // check input key
       // if entry isnt 5 letters
       if (element === 'Enter') {
@@ -169,6 +169,15 @@ document.addEventListener('DOMContentLoaded', () => {
         // turn over tiles
         const idCount = count * 5 + 1
         const timer = 300
+        currentArr.forEach((element, i) => {
+          setTimeout(() => {
+            const gridColour = gridColourFunc(element, i)
+            const idLetter = idCount + i
+            const elementLetter = document.getElementById(idLetter)
+            elementLetter.classList.add('animate__flipInX')
+            elementLetter.style = `background-color:${gridColour}`
+          }, timer * i) // extend interval in each letter
+        })
 
         count += 1
 
@@ -191,6 +200,24 @@ document.addEventListener('DOMContentLoaded', () => {
       lastElement.textContent = ''
       space = space - 1
     }
+  }
+
+   // change grid colours
+   function gridColourFunc (element, i) {
+    const rightElement = testWord.includes(element)
+
+    if (!rightElement) {
+      return 'rgb(58, 58, 60)'
+    }
+    // position
+    const elementPos = testWord.charAt(i)
+    const pos = element === elementPos
+
+    if (pos) {
+      return 'rgb(83, 141, 78)'
+    }
+
+    return 'rgb(181, 159, 59)'
   }
 
 
