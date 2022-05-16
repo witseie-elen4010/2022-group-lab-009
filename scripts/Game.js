@@ -9,6 +9,7 @@ window.addEventListener('load', (event) => {
   GetACK();
 });
 
+let testWord = "PANIC"
 
 
 
@@ -94,6 +95,16 @@ document.addEventListener('DOMContentLoaded', () => {
     letter[index].onclick = ({ target }) => {
       const element = target.getAttribute('data-key')
       // check input key
+      // if entry isnt 5 letters
+      if (element === 'Enter') {
+        submit()
+        return
+      }
+      // delete key
+      if (element === 'Delete') {
+        deleteKey()
+        return
+      }
       console.log(element)
       WordUpdate(element)
     
@@ -123,6 +134,62 @@ document.addEventListener('DOMContentLoaded', () => {
       const avaliableElement = document.getElementById(String(space)) // continue indexing til 5th col
       space = space + 1
       avaliableElement.textContent = element
+    }
+  }
+
+  function submit () {
+    const currentArr = currentWord()
+    if (currentArr.length < 5) {
+      window.alert('its not 5 letters')
+    } else {
+      const current = currentArr.join('')
+      console.log(current.toLowerCase())
+
+      // check real world
+      // dictionary is handled by database
+     /*  if (!WooldeWords.includes(current.toLowerCase())) {
+        window.alert('not real word')
+        deleteKey()
+        deleteKey()
+        deleteKey()
+        deleteKey()
+        deleteKey()
+      } */ 
+        // game won
+        if (current === testWord) {
+          window.alert('noice')
+        }
+        // check if game won
+        //  && current !== testWord
+        if (words.length === 6) {
+          window.alert('its chaii')
+          window.alert(`Word of the day: ${testWord}`)
+        }
+
+        // turn over tiles
+        const idCount = count * 5 + 1
+        const timer = 300
+
+        count += 1
+
+        // next row
+        words.push([])
+      
+    }
+  }
+
+  function deleteKey () {
+    const currentArr = currentWord()
+    if (currentArr.length > 0) {
+      const deleteElement = currentArr.pop() // remove letter
+      console.log(deleteElement)
+
+      words[words.length - 1] = currentArr
+
+      const lastElement = document.getElementById(String(space - 1))
+
+      lastElement.textContent = ''
+      space = space - 1
     }
   }
 
