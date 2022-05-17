@@ -9,7 +9,6 @@ document.onload = () =>{
 
 SubmitButton.addEventListener("click",function() {
     let tempPlayerName = sessionStorage.getItem("playerName")
-    //let tempUID = GenerateUniqueHash(tempPlayerName)
     if(tempPlayerName.length <  3){
         window.alert("Name To Short, Name needs to be atleast 3 characters");
         return
@@ -64,7 +63,6 @@ SubmitButton.addEventListener("click",function() {
                                 })
                               })
                               .then( (response) => { 
-                                 //do something awesome that makes the world a better place
                                   console.log(response)
                                   window.location.replace(response.url);
                               });
@@ -83,27 +81,10 @@ SubmitButton.addEventListener("click",function() {
 
 
     playerNameInput.addEventListener('input',function(){
-        console.log("Poggers!")
         sessionStorage .setItem("playerName", playerNameInput.value);
         console.log("Saved: " + sessionStorage .getItem("playerName"))
-        GenerateUniqueHash(sessionStorage.getItem("playerName"))
+       // GenerateUniqueHash(sessionStorage.getItem("playerName"))
     }) 
-
-
-function GenerateUniqueHash(playerName){
-    //set variable hash as 0
-    let hash = 0;
-    // if the length of the string is 0, return 0
-    if (playerName.length == 0) return hash;
-    for (i = 0 ;i<playerName.length ; i++)
-    {
-    ch = playerName.charCodeAt(i);
-    hash = ((hash << 5) - hash) + ch;
-    hash = hash & hash;
-    }
-    console.log("Unique Player ID: " + hash)
-    return hash;
-}
 
 
 
