@@ -50,6 +50,14 @@ body {
   float: inline-start;
 }
 
+.playersGrid{
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-gap: 5px;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
 .playerTitle {
   color: crimson;
   justify-content: center;
@@ -95,7 +103,7 @@ body {
   touch-action: manipulation;
 }
 
-.row button {
+.row input{
   height: 60px;
   width: 50px;
   cursor: pointer;

@@ -197,10 +197,10 @@ async function SetupOppBoard(){
 ///Game Functionality section
   document.addEventListener('DOMContentLoaded', () => {
     gridSystem()
-    const keys = document.querySelectorAll('.row button')
+    const keys = document.querySelectorAll('.row input')
     for (let index = 0; index < keys.length; index++) {
       keys[index].onclick = ({target}) => {
-        const key = target.getAttribute("data-key")
+        const key = target.getAttribute("value")
           // if entry isnt 5 letters
           if (key === 'Enter') {
             submit()
