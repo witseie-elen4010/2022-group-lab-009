@@ -210,7 +210,6 @@ const IsLegalWord = async (attemptWord) =>{
 }
 
 
-
 /*const testName = 'First'
 const testWord = 'Train'
 RecordPlayerAction(testName, testWord)*/
