@@ -191,15 +191,33 @@ const getRandomWord = async () => {
   }
 }
 
+//Returns true for word exist in database, false otherwise note async
+const IsLegalWord = async (attemptWord) =>{
+  try{
+    const sqlCom = 'SELECT [word] FROM [dbo].[wordle_word] WHERE [word] = \'' + attemptWord + '\''
+
+    const wordFound = await ConnectAndExecute(sqlCom)
+
+    if(wordFound.length){
+      return true
+    }
+    else{
+      return false
+    }
+  }catch(err){
+    console.log(err)
+  }
+}
+
+
+
 /*const testName = 'First'
 const testWord = 'Train'
 RecordPlayerAction(testName, testWord)*/
 
-getRandomWord().then(result => {
+IsLegalWord('aaaaa').then(result => {
   console.log(result)
 })
 .catch(err =>{
   console.log(err)
 })
-
-
