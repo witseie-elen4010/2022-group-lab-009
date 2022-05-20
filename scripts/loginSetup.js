@@ -2,6 +2,7 @@
 const playerUserNameInput = document.getElementById('userName')
 const playerUserPasswordInput = document.getElementById('userPassword')
 const SubmitButton = document.getElementById('LoginSubmit')
+const registerButton = document.getElementById('registerSubmit')
 
 document.onload = () => {
   playerUserNameInput = document.getElementById('userName')
@@ -10,6 +11,35 @@ document.onload = () => {
   playerUserPasswordInput = document.getElementById('userPassword')
   sessionStorage.setItem('userPassword', '')
 }
+
+registerButton.addEventListener('click', function () {
+  const playerUserPassword = sessionStorage.getItem('userPassword')
+  const playerUserName = sessionStorage.getItem('userName')
+  if (playerUserName.length < 3) {
+    window.alert('UserName To Short, requires atleast 3 characters')
+    return
+  }
+  // assigning a temp variable to check the userPassword
+
+  // Placing checks for UserPassword length here, can place additional checks here
+  if (playerUserPassword.length < 3) {
+    window.alert('Password To Short, requires atleast 3 characters')
+    return
+  }
+
+  fetch('/Login/Register', {
+    method: 'post',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      // Changing the playerName to userName
+      playerName: sessionStorage.getItem('userName'),
+      userPassword: sessionStorage.getItem('userPassword')
+    })
+  })
+})
 
 SubmitButton.addEventListener('click', function () {
   // assigning a temp variable to check the username
@@ -29,23 +59,8 @@ SubmitButton.addEventListener('click', function () {
   // Requires DB interation here to check the username and password authenticity
 
   // temp check for now
-  if (playerUserName === 'Admin') {
-    console.log('Passed Username Check')
-    if (playerUserPassword === 'Admin') {
-      console.log('Passed Password Check')
-    } else {
-      console.log('Failed Password Check')
-      window.alert('Incorrect Username or Password')
-      return
-    }
-  } else {
-    console.log('Failed Username Check')
-    window.alert('Incorrect Username or Password')
-    return
-  }
-
   let tempUID = ''
-  fetch('/Auth/GenerateNewUID', {
+  fetch('/Login/Login', {
     method: 'post',
     headers: {
       Accept: 'application/json',
@@ -53,21 +68,20 @@ SubmitButton.addEventListener('click', function () {
     },
     body: JSON.stringify({
       // Changing the playerName to userName
-      playerName: sessionStorage.getItem('userName')
+      playerName: sessionStorage.getItem('userName'),
+      userPassword: sessionStorage.getItem('userPassword')
     })
-  }).then((response) => {
-    console.log(response)
-    return response.json()
-  }).then((data) => {
-    console.log(data)
+  }).then(data => {
+    return data.json()
+  }).then(data => {
+    data = data.toString()
+    console.log('data: ', data)
     if (data.includes('FAILED')) {
-      console.log('UID Already in use, choose another name')
-      window.alert('Name already being used at the current moment!')
+      window.alert('login Failed')
     } else {
+      console.log('ID:', data)
       tempUID = data
-      console.log('UID Recieved from server!')
       sessionStorage.setItem('UID', tempUID)
-      console.log(tempUID)
     }
   }).then(() => {
     if (tempUID !== '') {
