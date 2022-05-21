@@ -2,15 +2,50 @@
 let FoundGame = false;
 let playerID = sessionStorage .getItem("playerName");
 let PlayerList;
+let GMWordle = document.getElementById('isGMGame');
 update();
-setInterval(update, 2500)
-
+setInterval(update, 1500)
 
 function update(){
-    GetAllQueued();
-    IsGameReady();
+  GetAllQueued();
+  IsGameReady();
+  CheckGameMode();
 }
 
+
+
+
+GMWordle.addEventListener("input", function (){
+  console.log(GMWordle.checked)
+  let wordInput = document.getElementById("GMWord")
+  if(GMWordle.checked == true && (wordInput.value == "" || wordInput.value.length < 5 || wordInput.value.length > 5 || wordInput.value == null)){
+    GMWordle.checked = false;
+    alert("Please enter a valid Word before enabling GM mode!")
+    return;
+  }
+  let gameMode = GMWordle.checked;
+  fetch("/Game/ChangeGameMode", {
+    method: "post",
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      gameMode: gameMode,
+      UID: sessionStorage.getItem("UID"),
+      Word: wordInput.value
+    })
+  })
+})
+
+async function CheckGameMode(){
+  fetch("/Game/GetGameMode").then(data => data.json()).then(data =>{
+        if(GMWordle.checked != data.gameMode){
+          GMWordle.checked = data.gameMode;
+          console.log("Player is GM: ", data.UID);
+        }   
+  })
+}
 
 async function GetAllQueued(){
     fetch('/Auth/ReturnPlayers').then((data) => {
@@ -52,6 +87,19 @@ function GetACK(){
         }
       })
 }
+async function ClearGameMode(){
+  fetch('/Game/ClearGameMode', {
+    method: 'post',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      playerName: sessionStorage.getItem('playerName'),
+      UID: sessionStorage.getItem('UID')
+    })
+  })
+}
 
 
 async function IsGameReady(){
@@ -75,7 +123,8 @@ let LeaveBtn = document.getElementById("QueueLeave")
 
 
 LeaveBtn.addEventListener('click', function (e) {
-    fetch("/Queue/Dequeue", {
+    ClearGameMode();
+    fetch("/Auth/Dequeue", {
         method: "post",
         headers: {
           'Accept': 'application/json',
@@ -95,6 +144,7 @@ LeaveBtn.addEventListener('click', function (e) {
 window.addEventListener("beforeunload",function(){
   if(FoundGame == false){
     Dequeue();
+    ClearGameMode()
   }
 })
 
@@ -127,6 +177,7 @@ function CheckForReload(){
   console.log(data);
     if (data === "reload") {
       Dequeue();
+      ClearGameMode()
     } 
 }
 
