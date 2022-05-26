@@ -5,6 +5,7 @@ const WindowId = setInterval(update, 1000)
 let playerList = []
 let GM = ''
 let testWord = '!'
+let gameOver = false
 
 window.addEventListener('beforeunload', function () {
   Dequeue()
@@ -96,7 +97,14 @@ async function GameStatus () {
     if (data.includes('Open') === false) {
       clearInterval(WindowId)
       Dequeue().then(() => {
-        window.alert('Player Left: Game Closing')
+        // adding an if statement here to control the output msg
+        // as the requeue uses this function, the output message may need to change
+        // depending on the situation
+        if (gameOver === true) {
+          window.alert('Player Won: Game Closing')
+        } else {
+          window.alert('Player Left: Game Closing')
+        }
         window.location.replace(data)
       })
     }
@@ -299,7 +307,6 @@ async function GetWord () {
 
 async function submit () {
   const currentArr = currentWord()
-  let gameOver = false
   if (currentArr.length !== 5) {
     window.alert('5 letters')
   }
