@@ -1,15 +1,15 @@
 
 'use strict'
-let SafeCheck = true;
+let SafeCheck = true
 const WindowId = setInterval(update, 1000)
 let playerList = []
-let GM = "";
-let testWord = "!"
+let GM = ''
+let testWord = '!'
 
 window.addEventListener('beforeunload', function () {
   Dequeue()
   CloseSync()
-  ClearGameMode();
+  ClearGameMode()
 })
 
 window.addEventListener('load', (event) => {
@@ -28,11 +28,11 @@ function CheckForReload () {
   if (data === 'reload') {
     Dequeue()
     CloseSync()
-    ClearGameMode();
+    ClearGameMode()
   }
 }
 
-async function ClearGameMode(){
+async function ClearGameMode () {
   fetch('/Game/ClearGameMode', {
     method: 'post',
     headers: {
@@ -46,21 +46,21 @@ async function ClearGameMode(){
   })
 }
 
-async function CheckGameMode(){
-  fetch("/Game/GetGameMode").then(data => data.json()).then(data =>{
-      console.log("Player is GM: ", data.UID);
-      gridSystem()
-      if(data.gameMode == true && data.UID == sessionStorage.getItem('UID')){
-        let playerGrid = document.getElementById("grid")
-        let PlayerKeyBoard = document.getElementById("key-container")
-        playerGrid.remove();
-        PlayerKeyBoard.remove();
-        SafeCheck = false;
-        console.log("grid Destroyed")
-      }else if(data.gameMode == true && data.UID != sessionStorage.getItem('UID')){
-        GM = data.UID;
-      }
-})
+async function CheckGameMode () {
+  fetch('/Game/GetGameMode').then(data => data.json()).then(data => {
+    console.log('Player is GM: ', data.UID)
+    gridSystem()
+    if (data.gameMode === true && data.UID === sessionStorage.getItem('UID')) {
+      const playerGrid = document.getElementById('grid')
+      const PlayerKeyBoard = document.getElementById('key-container')
+      playerGrid.remove()
+      PlayerKeyBoard.remove()
+      SafeCheck = false
+      console.log('grid Destroyed')
+    } else if (data.gameMode === true && data.UID !== sessionStorage.getItem('UID')) {
+      GM = data.UID
+    }
+  })
 }
 
 function GetACK () {
@@ -93,10 +93,10 @@ async function GameStatus () {
   fetch('/Auth/GameOpen').then((data) => {
     return data.json()
   }).then((data) => {
-    if (data.includes('Open') == false) {
+    if (data.includes('Open') === false) {
       clearInterval(WindowId)
       Dequeue().then(() => {
-        alert('Player Left: Game Closing')
+        window.alert('Player Left: Game Closing')
         window.location.replace(data)
       })
     }
@@ -132,14 +132,14 @@ async function SetupOppBoard () {
   }).then((data) => {
     playerList = data
     playerList = playerList.filter((data) => {
-      if (data.UID != sessionStorage.getItem('UID')) {
+      if (data.UID !== sessionStorage.getItem('UID')) {
         return data
       }
     })
     console.log('playerList: ', playerList)
     const opponentBoard = document.getElementById('playersGrid')
     playerList.forEach(data => {
-      if(data.UID != GM){
+      if (data.UID !== GM) {
         const container = document.createElement('div')
         container.setAttribute('id', '#' + data.UID)
         container.setAttribute('class', 'grid playerGridStyle')
@@ -183,7 +183,7 @@ async function GetSyncData () {
   fetch('Game/GetSync').then(data => data.json()).then((data) => {
     temp = data
     temp = temp.filter(element => {
-      if (element.UID != sessionStorage.getItem('UID')) {
+      if (element.UID !== sessionStorage.getItem('UID')) {
         return element
       }
     })
@@ -193,12 +193,12 @@ async function GetSyncData () {
       const tempPlayer = temp[0].UID
       console.log('Current PlayerID: ', tempPlayer)
       const PlayerMoves = temp.filter(element => {
-        if (element.UID == tempPlayer) {
+        if (element.UID === tempPlayer) {
           return element
         }
       })
       temp = temp.filter(element => {
-        if (element.UID != tempPlayer) {
+        if (element.UID !== tempPlayer) {
           return element
         }
       })
@@ -210,7 +210,7 @@ async function GetSyncData () {
         console.log('children: ', children)
         children.forEach(element => {
           console.log('We have ID:', element.id)
-          if (element.id == slot.toString()) {
+          if (element.id === slot.toString()) {
             element.style = `background-color:${Color}`
           }
         })
@@ -220,37 +220,34 @@ async function GetSyncData () {
 }
 
 /// Game Functionality section
-  document.addEventListener('DOMContentLoaded', () => {
-    CheckGameMode().then(()=>{
-      if(SafeCheck == true){
-        const keys = document.querySelectorAll('.row input')
-        for (let index = 0; index < keys.length; index++) {
-          keys[index].onclick = ({ target }) => {
-            const key = target.getAttribute('value')
-            // if entry isnt 5 letters
-            if (key === 'Enter') {
-
-              submit();
-              return
-            }
-      
-            // delete key
-            if (key === 'Delete') {
-              deleteKey()
-              return
-            }
-      
-            console.log(key)
-            WordUpdate(key)
+document.addEventListener('DOMContentLoaded', () => {
+  CheckGameMode().then(() => {
+    if (SafeCheck === true) {
+      const keys = document.querySelectorAll('.row input')
+      for (let index = 0; index < keys.length; index++) {
+        keys[index].onclick = ({ target }) => {
+          const key = target.getAttribute('value')
+          // if entry isnt 5 letters
+          if (key === 'Enter') {
+            submit()
+            return
           }
+
+          // delete key
+          if (key === 'Delete') {
+            deleteKey()
+            return
+          }
+
+          console.log(key)
+          WordUpdate(key)
         }
-      }else if(SafeCheck == false){
-        SetupOppBoard();
       }
-
-    })
+    } else if (SafeCheck === false) {
+      SetupOppBoard()
+    }
   })
-
+})
 
 // key input functions
 
@@ -291,21 +288,22 @@ function gridSystem () {
   SetupOppBoard()
 }
 
-async function GetWord(){
-  fetch("/Game/GetWord").then((data)=>{
-      return data.json();
-  }).then((data) =>{
-    console.log("word from server: ",data)
-    testWord = data.trim().toUpperCase();
+async function GetWord () {
+  fetch('/Game/GetWord').then((data) => {
+    return data.json()
+  }).then((data) => {
+    console.log('word from server: ', data)
+    testWord = data.trim().toUpperCase()
   })
 }
 
 async function submit () {
   const currentArr = currentWord()
+  let gameOver = false
   if (currentArr.length !== 5) {
     window.alert('5 letters')
   }
-  const current = currentArr.join('');
+  const current = currentArr.join('')
   console.log(current.toLowerCase())
 
   // HERE NEEDS TO BE UNCOMMENTED ONCE ZHUO HAS DATABASE HOOKS
@@ -313,13 +311,16 @@ async function submit () {
   // if (!WooldeWords.includes(current.toLowerCase())) {
   //  window.alert('not real word')
   // }
-  GetWord();
+  GetWord()
   await delay(1)
   // game won
-  console.log("Word to Guess: ", testWord)
-  console.log("Word Guessed: ", current)
+  console.log('Word to Guess: ', testWord)
+  console.log('Word Guessed: ', current)
   if (current === testWord) {
     window.alert('noice')
+    // Set a game over boolean to true
+    // Check after all the sync functions have run then do requeue
+    gameOver = true
   }
   // check if game won
   //  && current !== testWord
@@ -332,42 +333,41 @@ async function submit () {
   let idCount = count * 5 + 1
   let timer = 300
   const Data = new Array()
-  //Getting Data
+  // Getting Data
   currentArr.forEach((element, i) => {
-      const gridColour = gridColourFunc(element, i)
-      const idLetter = idCount + i
-      const temp = { idLetter, gridColour }
-      Data.push(temp)
+    const gridColour = gridColourFunc(element, i)
+    const idLetter = idCount + i
+    const temp = { idLetter, gridColour }
+    Data.push(temp)
   })
-  //Animation
+  // Animation
   idCount = count * 5 + 1
   timer = 300
- // currentArr.forEach((element, i) => {
-   // setTimeout(() => {
-     // const gridColour = gridColourFunc(element, i)
-      //const idLetter = idCount + i
-      //const elementLetter = document.getElementById(idLetter)
-      //elementLetter.classList.add('animate__flipInX')
-      //elementLetter.style = `background-color:${gridColour}`
-    //}, timer * i) // extend interval in each letter
-  //})
-  //await delay(1.5)
+  // currentArr.forEach((element, i) => {
+  // setTimeout(() => {
+  // const gridColour = gridColourFunc(element, i)
+  // const idLetter = idCount + i
+  // const elementLetter = document.getElementById(idLetter)
+  // elementLetter.classList.add('animate__flipInX')
+  // elementLetter.style = `background-color:${gridColour}`
+  // }, timer * i) // extend interval in each letter
+  // })
+  // await delay(1.5)
 
-  let tempPlayer = sessionStorage.getItem('UID');
+  const tempPlayer = sessionStorage.getItem('UID')
   const container = document.getElementById('grid')
-      Data.forEach((data) => {
-        const slot = data.idLetter
-        const Color = data.gridColour
-        const children = Array.from(container.children)
-        console.log('children: ', children)
-        children.forEach(element => {
-          console.log('We have ID:', element.id)
-          if (element.id == slot.toString()) {
-            element.style = `background-color:${Color}`
-          }
-        })
-      })
-
+  Data.forEach((data) => {
+    const slot = data.idLetter
+    const Color = data.gridColour
+    const children = Array.from(container.children)
+    console.log('children: ', children)
+    children.forEach(element => {
+      console.log('We have ID:', element.id)
+      if (element.id === slot.toString()) {
+        element.style = `background-color:${Color}`
+      }
+    })
+  })
 
   count += 1
   // next row
@@ -375,8 +375,18 @@ async function submit () {
   console.log('What we passing to sync: ', Data)
   console.log('After String: ', JSON.stringify(Data))
   SyncData(Data)
-  testWord = "!";
- 
+  testWord = '!'
+
+  if (gameOver === true) {
+    // Game over alert msg
+    window.alert('A player has won the game. A new game will now begin')
+    // perform requeue here
+    // Dequeue works to go back to the login screen the msg is wrong however
+    Dequeue()
+  } else {
+    // do nothing game is not over
+    // potentially invert this logic and encompass the relevant checks in the future
+  }
 }
 
 // change grid colours
