@@ -243,4 +243,4 @@ const LogPlayerAction = async (matchID, playerID, attemptWordID, attemptDateTime
 
 // LogPlayerAction(3,1,14,'2022-04-21 13:32:42')
 
-module.exports = { RegisterPlayer, PlayerLogin,getRandomWord}
+module.exports = { RegisterPlayer, PlayerLogin, getRandomWord, IsLegalWord, IncrementStreak, ResetStreak, ViewHighScore, CreateMatch, LogPlayerAction}
