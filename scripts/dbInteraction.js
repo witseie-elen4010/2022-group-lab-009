@@ -131,14 +131,19 @@ const IsLegalWord = async (attemptWord) => {
   }
 }
 
-// Require account name and hashed password both in string note async
-const RegisterPlayer = async (accountName, hashedPassword) => {
-  try {
-    const sqlCom = 'INSERT INTO [dbo].[player_account] VALUES (\'' + accountName + '\',\'' + hashedPassword + '\', 0, 0)'
 
-    await ConnectAndExecute(sqlCom)
-  } catch (err) {
+//Require account name and hashed password both in string note async, return id if successful and -1 if not due to account name duplication.
+const RegisterPlayer = async (accountName, hashedPassword) => {
+  try{
+    const sqlCom = 'INSERT INTO [dbo].[player_account] OUTPUT INSERTED.[id] VALUES (\'' + accountName + '\',\'' + hashedPassword + '\', 0, 0)'
+
+    const id_output = await ConnectAndExecute(sqlCom)
+
+    return id_output[0][1]
+
+  }catch(err){
     console.log(err)
+    return -1
   }
 }
 
@@ -165,16 +170,13 @@ const PlayerLogin = async (accountName, hashedPassword) => {
 
 // Increments player streak by 1 and updates high score if the streak is higher than previous high score note async
 const IncrementStreak = async (playerID) => {
-  try {
-    let sqlCom = 'UPDATE [dbo].[player_account] SET [streak] = [streak] + 1 WHERE [id] = ' + playerID.toString(10)
 
-    await ConnectAndExecute(sqlCom)
-
-    sqlCom = 'SELECT [high_score],[streak] FROM [dbo].[player_account] WHERE [id] = ' + playerID.toString(10)
+  try{
+    var sqlCom = 'UPDATE [dbo].[player_account] SET [streak] = [streak] + 1 OUTPUT inserted.[high_score], inserted.[streak] WHERE [id] = ' + playerID.toString(10)
 
     accountDetail = await ConnectAndExecute(sqlCom)
-
-    if (accountDetail[0][1] < accountDetail[1][1]) {
+    
+    if(accountDetail[0][1] < accountDetail[1][1]){
       sqlCom = 'UPDATE [dbo].[player_account] SET [high_score] = [streak] WHERE [id] = ' + playerID.toString(10)
 
       await ConnectAndExecute(sqlCom)
@@ -195,7 +197,26 @@ const ResetStreak = async (playerID) => {
   }
 }
 
-// Game mode is string, word_id is int and match start date is string in format 'YYYY-MM-DD' e.g. '2022-04-28' RETURNS the match id note async
+//returns highscore of given player id. returns -1 if no such player is found. note async
+const ViewHighScore = async (playerID) => {
+  try{
+    sqlCom = 'SELECT [high_score] FROM [dbo].[player_account] WHERE [id] = ' + playerID.toString(10)
+
+    playerHighScore = await ConnectAndExecute(sqlCom)
+
+    if(playerHighScore.length > 0)
+    {
+      return playerHighScore[0][1]
+    }
+    else{
+      return -1
+    }
+  }catch(err){
+    console.log(err)
+  }
+}
+
+//Game mode is string, word_id is int and match start date is string in format 'YYYY-MM-DD' e.g. '2022-04-28' RETURNS the match id note async
 const CreateMatch = async (gameMode, wordID, matchStartDate) => {
   try {
     const sqlCom = 'INSERT INTO [dbo].[match_log] OUTPUT INSERTED.[id] VALUES (\'' + gameMode + '\',' + wordID + ',\'' + matchStartDate + '\')'
@@ -219,25 +240,6 @@ const LogPlayerAction = async (matchID, playerID, attemptWordID, attemptDateTime
   }
 }
 
-/* PlayerLogin('testaccount', 'hashedpassword').then(result => {
-  console.log(result)
-})
-.catch(err =>{
-  console.log(err)
-}) */
-
-// RegisterPlayer('testaccount', 'hashedpassword')
-
-// ResetStreak(1)
-
-// IncrementStreak(1)
-
-/* CreateMatch('random', 17, '2022-04-21').then(result =>{
-  console.log(result)
-})
-.catch(err => {
-  console.log(err)
-}) */
 
 // LogPlayerAction(3,1,14,'2022-04-21 13:32:42')
 
