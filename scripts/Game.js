@@ -146,6 +146,12 @@ async function SetupOppBoard () {
     })
     console.log('playerList: ', playerList)
     const opponentBoard = document.getElementById('playersGrid')
+
+    //let PlayerScore= await ViewHighScore(data.UID)
+    document.getElementById("highScore 1").innerHTML = 'Highscore 1: 0'
+    document.getElementById("highScore 2").innerHTML = 'Highscore 2: 0'
+    document.getElementById("highScore 3").innerHTML = 'Highscore 3: 0'
+
     playerList.forEach(data => {
       if (data.UID !== GM) {
         const container = document.createElement('div')
