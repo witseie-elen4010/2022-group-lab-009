@@ -324,7 +324,7 @@ async function submit () {
   console.log('Word to Guess: ', testWord)
   console.log('Word Guessed: ', current)
   if (current === testWord) {
-    window.alert('noice')
+    window.alert('Correct')
     // Set a game over boolean to true
     // Check after all the sync functions have run then do requeue
     gameOver = true
@@ -332,7 +332,7 @@ async function submit () {
   // check if game won
   //  && current !== testWord
   if (words.length === 6) {
-    window.alert('its chaii')
+    window.alert('Game-Over')
     window.alert(`Word of the day: ${testWord}`)
   }
 

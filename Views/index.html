@@ -1,23 +1,30 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Page Title</title>
+        <link rel="stylesheet" href="../loginStyle.css">
+        <title>World Too Login</title>
 
 </head>
 <body>
-<h1>Wordle too</h1>
-    
-        <div>
-        <label for="Name">Enter Player Name</label>
-        <input type="text" id="playerName" name="playerName">
+        <div id="login_container">
+                <header>
+                        <h1 class="name">Wordle</h1>
+                </header>
+                <div>
+                        <!-- bootstrap labels and buttons? -->
+                        <label for="UserName" style="color:white;">Enter UserName</label>
+                        <input type="text" id="userName" name="userName">
+                        </div>
+                        <div>
+                        <label for="Password" style="color:white;">Enter Password</label>
+                        <input type="text" id="userPassword" name="userPassword">
+                        </div>
+                        <div class="button">
+                        <button id="LoginSubmit" type="submit">Login</button>
+                        <button id="registerSubmit" type="submit">Register</button>
+                        </div>
         </div>
-        <div class="button">
-        <button id="QueueSubmit" type="submit">Join Queue</button>
-        </div>
-        
-    
-
 </body>
 
-<script src="playerSetup.js"></script>
-</html> 
+<script src="loginSetup.js"></script>
+</html>
