@@ -7,5 +7,5 @@ Sprint two will focus on improving the game so that it may actually be played, F
 
 ### Moderation
 
-There is no backlog from this sprint though that being said, There are inmprovements to be made for the features added in this sprint, secondly these improvements will be added long side features from sprint - 3
+There is no backlog from this sprint though that being said, There are improvements to be made for the features added in this sprint, secondly these improvements will be added long side features from sprint - 3
 
