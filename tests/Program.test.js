@@ -1,8 +1,15 @@
 
 const request = require("supertest");
 const express = require("express");
-const app = require("../index")
+let app = require("../index")
 
+beforeAll(() =>{
+  app.close();
+})
+
+//==============================================================================\\
+//Queue Tests
+//==============================================================================\\
 
 describe('testing adding connection', function () {
     test('responds to /Auth/AddNewConnection', async () => {
@@ -12,8 +19,8 @@ describe('testing adding connection', function () {
     });
 })
 
-describe('Good Home Routes', function () {
-    test('responds to /Auth/AddNewConnection', async () => {
+describe('Lobby open', function () {
+    test('responds to /Auth/LobbyOpen', async () => {
       const res = await request(app).get('/Auth/LobbyOpen')
       expect(res.statusCode).toBe(200);
       expect(res.text).toBe("true")
@@ -24,7 +31,6 @@ describe('Able to generate UID', function () {
   test('responds to /Auth/GenerateNewUID', async () => {
     const res = await request(app).post('/Auth/GenerateNewUID').send({playerName: "Ivan"});
     expect(res.statusCode).toBe(200);
-    console.log(res)
     expect(res.body).toBe('2291258')
   });
 })
@@ -66,12 +72,45 @@ describe('Able to see status of lobby', function () {
     test('responds to /Auth/Status', async () => {
       const res = await request(app).get('/Auth/Status')
       expect(res.statusCode).toBe(200);
-      console.log(res)
       expect(res.body).toBe("/waiting")
     });
 })
 
+//==============================================================================\\
+//Game Tests
+//==============================================================================\\
 
+describe('Cant submit fake word', function () {
+  test('responds to /Game/CheckWord', async () => {
+    const res = await request(app).post('/Game/CheckWord').send({Word: "FFGGH"})
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toBe(-1)
+  });
+})
+
+describe('Can get word', function () {
+  test('responds to /Game/GetWord', async () => {
+    const res = await request(app).get('/Game/GetWord')
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toBe("")
+  });
+})
+
+describe('Can get game Mode', function () {
+  test('responds to /Game/GetGameMode', async () => {
+    const res = await request(app).get('/Game/GetGameMode')
+    expect(res.statusCode).toBe(200);
+    expect(res.body.gameMode).toBe(false)
+  });
+})
+
+beforeEach(() => {
+  app = require("../index")
+});
+
+afterEach(()=>{
+  app.close();
+})
 
 afterAll(() => {
     app.close();

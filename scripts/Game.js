@@ -319,13 +319,30 @@ async function submit () {
   const current = currentArr.join('')
   console.log(current.toLowerCase())
 
-  // HERE NEEDS TO BE UNCOMMENTED ONCE ZHUO HAS DATABASE HOOKS
-  // check real world
-  // if (!WooldeWords.includes(current.toLowerCase())) {
-  //  window.alert('not real word')
-  // }
   GetWord()
-  await delay(1)
+  let notAWord = false;
+  await fetch('/Game/CheckWord', {
+    method: 'post',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      Word: current
+    })
+  }).then(data => data.json()).then(data =>{
+    console.log("Number 1");
+    if(data == -1){
+      window.alert("Word Entered does not exist")
+      notAWord = true;
+      return
+    }
+  })
+
+  if(notAWord == true){
+    return;
+  }
+  console.log("Number 2");
   // game won
   console.log('Word to Guess: ', testWord)
   console.log('Word Guessed: ', current)
@@ -373,9 +390,7 @@ async function submit () {
     const slot = data.idLetter
     const Color = data.gridColour
     const children = Array.from(container.children)
-    console.log('children: ', children)
     children.forEach(element => {
-      console.log('We have ID:', element.id)
       if (element.id === slot.toString()) {
         element.style = `background-color:${Color}`
       }
