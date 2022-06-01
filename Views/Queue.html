@@ -1,25 +1,31 @@
 <!DOCTYPE html>
 <html>
 <head>
-
+<link rel="stylesheet" href="../queueStyle.css">
 <title>Queuing for Wordle 2</title>
 </head>
 <body>
-<h1>Queue</h1>
+<div id="queue_Container">
+        <header>
+                <h1 class = "name"> Queue</h1>
+        </header>
+                
 
-<div id = "PlayerQueueList">
-        
-</div>
-
-<div>
-        <button id="QueueLeave" type="submit">Leave Queue</button>
-        <div>
-                <input type="text" id="GMWord" name="GMWord">
-                <input id="isGMGame" type="checkbox" name="Game Master">
-                <label for="Game Master">Game Master Wordle</label>
+        <div id = "PlayerQueueList" style="color:white;">
+                
         </div>
-        
+
+        <div>
+                <button id="QueueLeave" type="submit">Leave Queue</button>
+                <div>
+                        <input type="text" id="GMWord" name="GMWord">
+                        <input id="isGMGame" type="checkbox" name="Game Master">
+                        <label for="Game Master"  style="color:white;">Game Master Wordle</label>
+                </div>
+                
+        </div>
 </div>
+
 
 </body>
 

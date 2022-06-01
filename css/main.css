@@ -64,11 +64,11 @@ body {
   align-items: center;
 }
 
-.square {
+.col-sm-3 {
   display: flex;
   border: 2px solid rgb(58, 58, 60);
-  min-width: 45px;
-  min-height: 45px;
+  min-width: 30px;
+  min-height: 30px;
   font-size: 2rem;
   color:white;
   justify-content: center;

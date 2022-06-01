@@ -199,7 +199,7 @@ async function SetupOppBoard () {
         console.log('x value: ', player)
         for (let i = 0; i < 30; i++) {
           const grid = document.createElement('div')
-          grid.classList.add('square')
+          grid.classList.add('col-sm-3')
           grid.classList.add('flipping')
           grid.setAttribute('id', i + 1) // index starts at one not 0
           container.appendChild(grid)
@@ -333,7 +333,7 @@ function gridSystem () {
   const gameBoard = document.getElementById('grid')
   for (let i = 0; i < 30; i++) {
     const grid = document.createElement('div')
-    grid.classList.add('square')
+    grid.classList.add('col-sm-3')
     grid.classList.add('flipping')
     grid.setAttribute('id', i + 1) // index starts at one not 0
     gameBoard.appendChild(grid)
