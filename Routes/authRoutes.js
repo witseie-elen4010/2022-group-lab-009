@@ -2,6 +2,7 @@
 const UIDlib = require("../scripts/HashGen")
 const path = require('path')
 const express = require('express')
+const DB = require('../scripts/dbInteraction')
 const authRoutes = express.Router()
 let AuthList = [];
 let AbleToJoin = true;
@@ -80,6 +81,16 @@ authRoutes.get("/GameOpen", function (req, res) {
 
 authRoutes.get('/ReturnPlayers',function (req, res) {
     res.json(AuthList)
+})
+
+authRoutes.get('/ReturnPlayersScore', async function (req, res) {
+    let storageList = []
+    for(let index = 0; index < PlayerLimit; index++){
+        let Score = await DB.ViewHighScore(AuthList[index].UID)
+        let temp = {UID: AuthList[index].UID, playerName: AuthList[index].playerName, Score: Score}
+        storageList.push(temp);
+    }
+    res.json(storageList)
 })
 
 authRoutes.post('/Dequeue', function (req, res) {
