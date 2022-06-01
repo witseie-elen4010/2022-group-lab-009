@@ -6,6 +6,7 @@ let playerList = []
 let GM = ''
 let testWord = '!'
 let gameOver = false
+let hasWon = false;
 
 window.addEventListener('beforeunload', function () {
   Dequeue()
@@ -134,6 +135,31 @@ async function CloseSync () {
   })
 }
 
+async function GetHighScore(UID){
+  let HighScore = 0
+  fetch('/Game/PlayerHighScore', {
+    method: 'post',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      UID: UID
+    })
+  })
+    .then((response) => {
+      return response.json();
+    }).then(data=>{
+      HighScore = data;
+      return HighScore;
+    })
+
+}
+
+async function SetupHighScore(PlayerList){
+
+}
+
 async function SetupOppBoard () {
   fetch('/Auth/ReturnPlayers').then((data) => {
     return data.json()
@@ -145,33 +171,46 @@ async function SetupOppBoard () {
       }
     })
     console.log('playerList: ', playerList)
-    const opponentBoard = document.getElementById('playersGrid')
+    const opponentBoard = document.getElementById('playersGrid');
 
-    //let PlayerScore= await ViewHighScore(data.UID)
-    document.getElementById("highScore 1").innerHTML = 'Highscore 1: 0'
-    document.getElementById("highScore 2").innerHTML = 'Highscore 2: 0'
-    document.getElementById("highScore 3").innerHTML = 'Highscore 3: 0'
+     fetch('Auth/ReturnPlayersScore').then(data => data.json()).then(data =>{
+      playerList = data
+      playerList = playerList.filter((data) => {
+        if (data.UID !== sessionStorage.getItem('UID')) {
+          return data
+        }
+      })
+      playerList.forEach(player =>{
+          let temp = document.getElementById('#Score' + player.UID)
+          temp.innerHTML = player.playerName + " - " + player.Score;
+      })
+    })
 
-    playerList.forEach(data => {
-      if (data.UID !== GM) {
+    for(let player of playerList){
+      if (player.UID !== GM) {
         const container = document.createElement('div')
-        container.setAttribute('id', '#' + data.UID)
+        container.setAttribute('id', '#' + player.UID)
         container.setAttribute('class', 'grid playerGridStyle')
         const heading = document.createElement('h2')
-        heading.innerHTML = data.playerName
+        heading.setAttribute('id','#Score' + player.UID)
+        heading.innerHTML = player.playerName;
         heading.setAttribute('class', 'playerTitle')
         opponentBoard.appendChild(heading)
-        console.log('x value: ', data)
+        console.log('x value: ', player)
         for (let i = 0; i < 30; i++) {
           const grid = document.createElement('div')
           grid.classList.add('square')
           grid.classList.add('flipping')
           grid.setAttribute('id', i + 1) // index starts at one not 0
           container.appendChild(grid)
-        }
+        }        
         opponentBoard.appendChild(container)
       }
-    })
+    }
+
+   // playerList.forEach(data => {
+     
+    //})
   })
 }
 
@@ -350,7 +389,18 @@ async function submit () {
     window.alert('Correct')
     // Set a game over boolean to true
     // Check after all the sync functions have run then do requeue
-    gameOver = true
+    fetch('/Game/IncreaseScore', {
+      method: 'post',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        UID: sessionStorage.getItem('UID')
+      })
+    })
+    hasWon = true;
+    gameOver = true;
   }
   // check if game won
   //  && current !== testWord
@@ -408,9 +458,27 @@ async function submit () {
   if (gameOver === true) {
     // Game over alert msg
     window.alert('A player has won the game. A new game will now begin')
-    // perform requeue here
-    // Dequeue works to go back to the login screen the msg is wrong however
-    Dequeue()
+    if(hasWon == true){
+      Dequeue()
+      CloseSync()
+      ClearGameMode()
+    }else if(hasWon == false){
+      fetch('/Game/EndStreak', {
+        method: 'post',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          UID: sessionStorage.getItem('UID')
+        })
+      })
+      window.alert("You Lose! hahah streak bye bye")
+      Dequeue();
+      CloseSync()
+      ClearGameMode()
+    }
+    
   } else {
     // do nothing game is not over
     // potentially invert this logic and encompass the relevant checks in the future

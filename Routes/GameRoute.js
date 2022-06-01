@@ -38,6 +38,22 @@ gameRouter.post('/CheckWord',function (req, res) {
     })
 })
 
+gameRouter.post('/IncreaseScore',function (req, res) {
+    DB.IncrementStreak(req.body.UID);
+})
+
+gameRouter.post('/EndStreak',function (req, res) {
+    DB.ResetStreak(req.body.UID);
+})
+
+gameRouter.post('/PlayerHighScore',function (req, res) {
+    DB.ViewHighScore(req.body.UID).then(data =>{
+        console.log("we got a High score of: ",data)
+        let temp = {UID: req.body.UID, HighScore: data}
+        res.json(temp);
+    })
+})
+
 
 gameRouter.get('/GetSync',function (req, res) {
     res.json(SyncList);
