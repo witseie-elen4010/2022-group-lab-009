@@ -1,23 +1,47 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>World Too Login</title>
+        <link rel="stylesheet" href="../loginStyle.css">
+        <title>World Too Login</title>
 
 </head>
 <body>
-<h1>Wordle too</h1>    
-        <div>
-        <label for="UserName">Enter UserName</label>
-        <input type="text" id="userName" name="userName">
+        <div id="login_container">
+                <header>
+                        <h1 class="name">Wordle</h1>
+                </header>
+                <div>
+                        <!-- bootstrap labels and buttons? -->
+                        <label for="UserName" style="color:white;">Enter UserName</label>
+                        <input type="text" id="userName" name="userName">
+                        </div>
+                        <div>
+                        <label for="Password" style="color:white;">Enter Password</label>
+                        <input type="password" id="userPassword" value=""><br>
+                        <br>
+                </div>
+
+                <div class="showPass">
+                        <input type="checkbox" onclick="reveal()">Show Password
+        
+                        <div class="button">
+                        <button id="LoginSubmit" type="submit">Login</button>
+                        <button id="registerSubmit" type="submit">Register</button>
+                </div>
+                </div>
         </div>
-        <div>
-        <label for="Password">Enter Password</label>
-        <input type="text" id="userPassword" name="userPassword">
-        </div>
-        <div class="button">
-        <button id="LoginSubmit" type="submit">Login</button>
-        <button id="registerSubmit" type="submit">Register</button>
-        </div>
+
+        <script>
+                function reveal(){
+                        var data = document.getElementById("userPassword");
+                        if(data.type === "password"){
+                                data.type = "text";
+                        }
+                        else{
+                                data.type = "password";
+                        }
+                }
+        </script>
 </body>
 
 <script src="loginSetup.js"></script>
