@@ -32,6 +32,13 @@ gameRouter.post('/Sync',function (req, res) {
     console.log("SyncList: ",SyncList)
 })
 
+gameRouter.post('/CheckWord',function (req, res) {
+    DB.IsLegalWord(req.body.Word).then((data)=>{
+        res.json(data);
+    })
+})
+
+
 gameRouter.get('/GetSync',function (req, res) {
     res.json(SyncList);
 })
