@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<style>
+* {
+  box-sizing: border-box;
+}
+
+.row {
+  display: flex;
+  margin-left:-5px;
+  margin-right:-5px;
+}
+
+.column {
+  flex: 50%;
+  padding: 5px;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  width: 100%;
+  border: 1px solid #ddd;
+}
+
+th, td {
+  text-align: left;
+  padding: 16px;
+}
+
+tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+</style>
+<head>
+        <link rel="stylesheet" href="../loginStyle.css">
+        <title>Wordle Logs</title>
+
+</head>
+<body>
+        <div class="row">
+                <div class="column"> 
+                        <table style = "width:90%" id="table1"></table>
+                </div>
+                <div class="column">
+                        <table style = "width:90%" id="table2"></table>
+                </div>
+        </div>
+        <button id="backSubmit" type="submit">Back</button>
+</body>
+
+<script src="logService.js"></script>
+
+</html>

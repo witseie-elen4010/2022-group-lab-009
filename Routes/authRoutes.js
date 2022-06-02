@@ -7,6 +7,8 @@ const authRoutes = express.Router()
 let AuthList = [];
 let AbleToJoin = true;
 const PlayerLimit = 3;
+let IsHighScoreLoaded = false;
+let HighScoreList = []
 
 
 authRoutes.post('/ACK',function (req, res) {
@@ -84,13 +86,7 @@ authRoutes.get('/ReturnPlayers',function (req, res) {
 })
 
 authRoutes.get('/ReturnPlayersScore', async function (req, res) {
-    let storageList = []
-    for(let index = 0; index < PlayerLimit; index++){
-        let Score = await DB.ViewHighScore(AuthList[index].UID)
-        let temp = {UID: AuthList[index].UID, playerName: AuthList[index].playerName, Score: Score}
-        storageList.push(temp);
-    }
-    res.json(storageList)
+    res.json(HighScoreList)
 })
 
 authRoutes.post('/Dequeue', function (req, res) {
@@ -107,22 +103,49 @@ authRoutes.post('/Dequeue', function (req, res) {
     console.log(NewList)
     AuthList = NewList
     Joined = NewList
+    IsHighScoreLoaded = false
     res.redirect('/')
-
 })
 
-authRoutes.get('/Status', function (req, res) {
-
+authRoutes.get('/Status', async function (req, res) {
     if(AuthList.length >= PlayerLimit){
         AbleToJoin = false;
         let temp = "/Game";
+        if(!IsHighScoreLoaded){
+            IsHighScoreLoaded = true
+
+            let storageList = []
+
+            let UIDList = []
+        
+            for(let index = 0; index < PlayerLimit; index++){
+                UIDList.push(AuthList[index].UID);
+            }
+        
+            storageList = await DB.ViewMulipleHighScore(UIDList)
+
+            let extendedStorageList = []
+
+            for(let i = 0; i < PlayerLimit; i++)
+            {
+                for(let j = 0; j < PlayerLimit; j++)
+                {
+                    if(AuthList[i].UID == storageList[j].UID)
+                    {
+                        let temp = {playerName: AuthList[i].playerName, UID: AuthList[i].UID, Score: storageList[j].Score}
+
+                        extendedStorageList.push(temp)
+                    }
+                }
+            }
+
+            HighScoreList = extendedStorageList
+        }
         res.json(temp)
     }else{
         let temp = "/waiting"
         res.json(temp);
     }
-
-
 })
 
 

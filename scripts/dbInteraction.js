@@ -108,7 +108,9 @@ const getRandomWord = async () => {
 
     const randomWord = await ConnectAndExecute(sqlCom)
 
-    return randomWord[0][1]
+    let temp = {Word:randomWord[0][1], WordID:randomWordID}
+
+    return temp
   } catch (err) {
     console.log(err)
   }
@@ -211,6 +213,43 @@ const ViewHighScore = async (playerID) => {
   }
 }
 
+const ViewMulipleHighScore = async (playerID) => {
+  try {
+    sqlCondition = ''
+
+    for(let i = 0; i < playerID.length; i++)
+    {
+      if(i+1 != playerID.length)
+      {
+        sqlCondition = sqlCondition + ' [id] = ' + playerID[i].toString() + ' OR'
+      }
+      else{
+        sqlCondition = sqlCondition + ' [id] = ' + playerID[i].toString()
+      }
+    }
+
+    const sqlCom = 'SELECT [id],[high_score] FROM [dbo].[player_account] WHERE' + sqlCondition
+
+    console.log(sqlCom)
+
+    let playerHighScore = await ConnectAndExecute(sqlCom)
+
+    let result = []
+
+    for(let i = 0; i < playerID.length; i++)
+    {
+      let temp = {UID: playerHighScore[2*i][1], Score: playerHighScore[2*i+1][1]}
+
+      result.push(temp)
+    }
+
+    return result
+
+  } catch (err) {
+    console.log(err)
+  }
+}
+
 // Game mode is string, word_id is int and match start date is string in format 'YYYY-MM-DD' e.g. '2022-04-28' RETURNS the match id note async
 const CreateMatch = async (gameMode, wordID, matchStartDate) => {
   try {
@@ -235,6 +274,37 @@ const LogPlayerAction = async (matchID, playerID, attemptWordID, attemptDateTime
   }
 }
 
-// LogPlayerAction(3,1,14,'2022-04-21 13:32:42')
+const GetMatchLogTable = async() => {
+  try{
+    const sqlCom = 'SELECT m.[id], game_mode, word as correct_word, match_date FROM [dbo].[match_log] as m LEFT JOIN wordle_word as w ON m.word_id = w.id'
 
-module.exports = { RegisterPlayer, PlayerLogin, getRandomWord, IsLegalWord, IncrementStreak, ResetStreak, ViewHighScore, CreateMatch, LogPlayerAction }
+    const table = await ConnectAndExecute(sqlCom)
+
+    return table
+  }catch(err){
+    console.log(err)
+  }
+}
+
+const GetActionLogTable = async() => {
+  try{
+    const sqlCom = 'SELECT [match_id],[player_account_name] as playe_name,[word] as Guess_Word,[attempted_datetime] FROM [dbo].[action_log] as a LEFT JOIN player_account as p ON a.player_id = p.id LEFT JOIN wordle_word as w ON a.word_id = w.id'
+
+    const table = await ConnectAndExecute(sqlCom)
+
+    console.log(table)
+
+    return table
+  }catch(err){
+    console.log(err)
+  }
+}
+
+/*ViewMulipleHighScore([1,2,3]).then((result) =>{
+  console.log(result)
+})*/
+
+//GetMatchLogTable()
+//GetActionLogTable()
+
+module.exports = { RegisterPlayer, PlayerLogin, getRandomWord, IsLegalWord, IncrementStreak, ResetStreak, ViewHighScore, CreateMatch, LogPlayerAction, ViewMulipleHighScore, GetMatchLogTable, GetActionLogTable}

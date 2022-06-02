@@ -1,20 +1,54 @@
 const path = require('path')
 const express = require('express')
 const gameRouter = express.Router()
-const DB = require('../scripts/dbInteraction')
+const DB = require('../scripts/dbInteraction');
+const dateFormat = require('../scripts/DateFormat')
+const { match } = require('assert');
 let GameInProgress = true;
 let SyncList = [];
 let GMWordle = false;
 let GMUID = ""
 let gameWord = "";
 let counter = 0;
+let gameModeStr = 'selected'
+let matchID = -1
+
 
 gameRouter.get('/', (req, res) => {
     if(GMWordle == false && counter == 0){
         counter += 1;
+        gameModeStr = 'randomed'
         DB.getRandomWord().then((data)=>{
             console.log("Word for Game is: ", data)
-            gameWord = data;   
+            gameWord = data.Word;
+            let matchDate = new Date()
+            DB.CreateMatch(gameModeStr, data.WordID, matchDate.toISOString().split('T')[0]).then((returnedMatchID) => {
+                matchID = returnedMatchID
+            })  
+        })
+    }
+    else if(GMWordle == true && counter == 0)
+    {
+        counter += 1;
+        DB.IsLegalWord(gameWord).then((data) => {
+            if(data == -1)
+            {
+                gameModeStr = 'randomed'
+                DB.getRandomWord().then((randomWord)=>{
+                    console.log("Word for Game is: ", randomWord)
+                    gameWord = randomWord.Word;
+                    let matchDate = new Date()
+                    DB.CreateMatch(gameModeStr, randomWord.WordID, matchDate.toISOString().split('T')[0]).then((returnedMatchID) => {
+                            matchID = returnedMatchID
+                    })  
+                })
+            }
+            else{
+                let matchDate = new Date()
+                DB.CreateMatch(gameModeStr, data, matchDate.toISOString().split('T')[0]).then((returnedMatchID) => {
+                    matchID = returnedMatchID
+                })  
+            }
         })
     }
     res.sendFile(path.join(__dirname, '../Views/Game.html'))
@@ -100,6 +134,10 @@ gameRouter.get('/GetGameMode',function (req, res) {
         UID: GMUID
     }
     res.json(temp)
+})
+
+gameRouter.post('/LogGuess',function (req, res) {
+    DB.LogPlayerAction(matchID, req.body.UID, req.body.WordID, dateFormat.formatDate(new Date()))
 })
 
 module.exports = gameRouter

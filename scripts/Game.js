@@ -156,8 +156,26 @@ async function GetHighScore(UID){
 
 }
 
-async function SetupHighScore(PlayerList){
-
+async function SetupHighScore(){
+  let playerList = []
+  fetch('Auth/ReturnPlayersScore').then(data => data.json()).then(data =>{
+    playerList = data
+    if(playerList.length == 0)
+    {
+      SetupHighScore()
+      return
+    }
+    playerList = playerList.filter((data) => {
+      if (data.UID !== sessionStorage.getItem('UID')) {
+        return data
+      }
+    })
+    playerList.forEach(player =>{
+        let temp = document.getElementById('#Score' + player.UID)
+        temp.innerHTML +=  " - " + player.Score;
+    })
+  })
+  
 }
 
 async function SetupOppBoard () {
@@ -173,18 +191,7 @@ async function SetupOppBoard () {
     console.log('playerList: ', playerList)
     const opponentBoard = document.getElementById('playersGrid');
 
-     fetch('Auth/ReturnPlayersScore').then(data => data.json()).then(data =>{
-      playerList = data
-      playerList = playerList.filter((data) => {
-        if (data.UID !== sessionStorage.getItem('UID')) {
-          return data
-        }
-      })
-      playerList.forEach(player =>{
-          let temp = document.getElementById('#Score' + player.UID)
-          temp.innerHTML = player.playerName + " - " + player.Score;
-      })
-    })
+    SetupHighScore()
 
     for(let player of playerList){
       if (player.UID !== GM) {
@@ -360,6 +367,7 @@ async function submit () {
 
   GetWord()
   let notAWord = false;
+  let GuessID = -1;
   await fetch('/Game/CheckWord', {
     method: 'post',
     headers: {
@@ -375,6 +383,9 @@ async function submit () {
       window.alert("Word Entered does not exist")
       notAWord = true;
       return
+    }
+    else{
+      GuessID = data
     }
   })
 
@@ -453,6 +464,7 @@ async function submit () {
   console.log('What we passing to sync: ', Data)
   console.log('After String: ', JSON.stringify(Data))
   SyncData(Data)
+  LogGuess(GuessID)
   testWord = '!'
 
   if (gameOver === true) {
@@ -519,5 +531,19 @@ function deleteKey () {
 function delay (n) {
   return new Promise(function (resolve) {
     setTimeout(resolve, n * 1000)
+  })
+}
+
+async function LogGuess(data){
+  fetch('/Game/LogGuess', {
+    method: 'post',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      UID: sessionStorage.getItem('UID'),
+      WordID: data
+    })
   })
 }
