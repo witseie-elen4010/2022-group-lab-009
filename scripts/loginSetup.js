@@ -3,6 +3,7 @@ const playerUserNameInput = document.getElementById('userName')
 const playerUserPasswordInput = document.getElementById('userPassword')
 const SubmitButton = document.getElementById('LoginSubmit')
 const registerButton = document.getElementById('registerSubmit')
+const logsButton = document.getElementById('logsSubmit')
 
 document.onload = () => {
   playerUserNameInput = document.getElementById('userName')
@@ -11,6 +12,12 @@ document.onload = () => {
   playerUserPasswordInput = document.getElementById('userPassword')
   sessionStorage.setItem('userPassword', '')
 }
+
+logsButton.addEventListener('click', function(){
+  fetch('/Logs/ViewLogs').then((data) => {
+    window.location.replace(data.url)
+  })
+})
 
 registerButton.addEventListener('click', function () {
   const playerUserPassword = sessionStorage.getItem('userPassword')
