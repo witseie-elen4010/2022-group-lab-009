@@ -168,6 +168,20 @@ const PlayerLogin = async (accountName, hashedPassword) => {
   }
 }
 
+const DeletePlayerByID = async (accountID) => {
+  try{
+    const sqlCom = 'DELETE FROM [dbo].[player_account] OUTPUT DELETED.[id] WHERE id = ' + accountID.toString()
+
+    console.log(sqlCom)
+
+    const result = await ConnectAndExecute(sqlCom)
+
+    return result
+  }catch(err){
+    console.log(err)
+  }
+}
+
 // Increments player streak by 1 and updates high score if the streak is higher than previous high score note async
 const IncrementStreak = async (playerID) => {
   try {
@@ -300,11 +314,11 @@ const GetActionLogTable = async() => {
   }
 }
 
-/*ViewMulipleHighScore([1,2,3]).then((result) =>{
+DeletePlayerByID(9).then((result) =>{
   console.log(result)
-})*/
+})
 
 //GetMatchLogTable()
 //GetActionLogTable()
 
-module.exports = { RegisterPlayer, PlayerLogin, getRandomWord, IsLegalWord, IncrementStreak, ResetStreak, ViewHighScore, CreateMatch, LogPlayerAction, ViewMulipleHighScore, GetMatchLogTable, GetActionLogTable}
+module.exports = { RegisterPlayer, PlayerLogin, getRandomWord, IsLegalWord, IncrementStreak, ResetStreak, ViewHighScore, CreateMatch, LogPlayerAction, ViewMulipleHighScore, GetMatchLogTable, GetActionLogTable, DeletePlayerByID}
