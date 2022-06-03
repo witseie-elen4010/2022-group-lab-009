@@ -6,7 +6,7 @@ let playerList = []
 let GM = ''
 let testWord = '!'
 let gameOver = false
-let hasWon = false;
+let hasWon = false
 
 window.addEventListener('beforeunload', function () {
   Dequeue()
@@ -86,12 +86,17 @@ function GetACK () {
       if (data.includes('Sucess!')) {
         console.log('Connected')
       } else {
-        window.location.replace(data)
+        console.log('===> The window location redirect')
+        console.log(data)
+        // testing main redirect control
+        // Does not control winner reload
+        // window.location.replace(data)
       }
     })
 }
 
 async function GameStatus () {
+  // controls the reload pages of the non winning user
   fetch('/Auth/GameOpen').then((data) => {
     return data.json()
   }).then((data) => {
@@ -103,10 +108,13 @@ async function GameStatus () {
         // depending on the situation
         if (gameOver === true) {
           window.alert('Player Won: Game Closing')
+          console.log('===> GameStatus Ran')
         } else {
           window.alert('Player Left: Game Closing')
         }
-        window.location.replace(data)
+        console.log('Windows relocate due to game status function ', data)
+        console.log('===> Windows relocate Ran')
+        // window.location.replace(data)
       })
     }
   })
@@ -135,7 +143,7 @@ async function CloseSync () {
   })
 }
 
-async function GetHighScore(UID){
+async function GetHighScore (UID) {
   let HighScore = 0
   fetch('/Game/PlayerHighScore', {
     method: 'post',
@@ -144,24 +152,22 @@ async function GetHighScore(UID){
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      UID: UID
+      UID
     })
   })
     .then((response) => {
-      return response.json();
-    }).then(data=>{
-      HighScore = data;
-      return HighScore;
+      return response.json()
+    }).then(data => {
+      HighScore = data
+      return HighScore
     })
-
 }
 
-async function SetupHighScore(){
+async function SetupHighScore () {
   let playerList = []
-  fetch('Auth/ReturnPlayersScore').then(data => data.json()).then(data =>{
+  fetch('Auth/ReturnPlayersScore').then(data => data.json()).then(data => {
     playerList = data
-    if(playerList.length == 0)
-    {
+    if (playerList.length == 0) {
       SetupHighScore()
       return
     }
@@ -170,12 +176,11 @@ async function SetupHighScore(){
         return data
       }
     })
-    playerList.forEach(player =>{
-        let temp = document.getElementById('#Score' + player.UID)
-        temp.innerHTML +=  " - " + player.Score;
+    playerList.forEach(player => {
+      const temp = document.getElementById('#Score' + player.UID)
+      temp.innerHTML += ' - ' + player.Score
     })
   })
-  
 }
 
 async function SetupOppBoard () {
@@ -189,18 +194,18 @@ async function SetupOppBoard () {
       }
     })
     console.log('playerList: ', playerList)
-    const opponentBoard = document.getElementById('playersGrid');
+    const opponentBoard = document.getElementById('playersGrid')
 
     SetupHighScore()
 
-    for(let player of playerList){
+    for (const player of playerList) {
       if (player.UID !== GM) {
         const container = document.createElement('div')
         container.setAttribute('id', '#' + player.UID)
         container.setAttribute('class', 'grid playerGridStyle')
         const heading = document.createElement('h2')
-        heading.setAttribute('id','#Score' + player.UID)
-        heading.innerHTML = player.playerName;
+        heading.setAttribute('id', '#Score' + player.UID)
+        heading.innerHTML = player.playerName
         heading.setAttribute('class', 'playerTitle')
         opponentBoard.appendChild(heading)
         console.log('x value: ', player)
@@ -210,14 +215,14 @@ async function SetupOppBoard () {
           grid.classList.add('flipping')
           grid.setAttribute('id', i + 1) // index starts at one not 0
           container.appendChild(grid)
-        }        
+        }
         opponentBoard.appendChild(container)
       }
     }
 
-   // playerList.forEach(data => {
-     
-    //})
+    // playerList.forEach(data => {
+
+    // })
   })
 }
 
@@ -366,8 +371,8 @@ async function submit () {
   console.log(current.toLowerCase())
 
   GetWord()
-  let notAWord = false;
-  let GuessID = -1;
+  let notAWord = false
+  let GuessID = -1
   await fetch('/Game/CheckWord', {
     method: 'post',
     headers: {
@@ -377,22 +382,20 @@ async function submit () {
     body: JSON.stringify({
       Word: current
     })
-  }).then(data => data.json()).then(data =>{
-    console.log("Number 1");
-    if(data == -1){
-      window.alert("Word Entered does not exist")
-      notAWord = true;
-      return
-    }
-    else{
+  }).then(data => data.json()).then(data => {
+    console.log('Number 1')
+    if (data == -1) {
+      window.alert('Word Entered does not exist')
+      notAWord = true
+    } else {
       GuessID = data
     }
   })
 
-  if(notAWord == true){
-    return;
+  if (notAWord == true) {
+    return
   }
-  console.log("Number 2");
+  console.log('Number 2')
   // game won
   console.log('Word to Guess: ', testWord)
   console.log('Word Guessed: ', current)
@@ -410,8 +413,8 @@ async function submit () {
         UID: sessionStorage.getItem('UID')
       })
     })
-    hasWon = true;
-    gameOver = true;
+    hasWon = true
+    gameOver = true
   }
   // check if game won
   //  && current !== testWord
@@ -470,11 +473,18 @@ async function submit () {
   if (gameOver === true) {
     // Game over alert msg
     window.alert('A player has won the game. A new game will now begin')
-    if(hasWon == true){
+    if (hasWon == true) {
+      const num = 0
+      const userName = sessionStorage.getItem('playerName')
+      const userUID = sessionStorage.getItem('UID')
       Dequeue()
       CloseSync()
       ClearGameMode()
-    }else if(hasWon == false){
+      window.alert('Test Requeuing here')
+      // testing winner redirect control
+      // Controls winner redirect
+      window.location.replace('/Queue')
+    } else if (hasWon == false) {
       fetch('/Game/EndStreak', {
         method: 'post',
         headers: {
@@ -485,12 +495,18 @@ async function submit () {
           UID: sessionStorage.getItem('UID')
         })
       })
-      window.alert("You Lose! hahah streak bye bye")
-      Dequeue();
+      window.alert('You Lose! hahah streak bye bye')
+      const num = 0
+      const userName = sessionStorage.getItem('playerName')
+      const userUID = sessionStorage.getItem('UID')
+      Dequeue()
       CloseSync()
       ClearGameMode()
+      window.alert('Test Requeuing here')
+      // testing winner redirect control
+      // Controls winner redirect
+      // window.location.replace('/Queue')
     }
-    
   } else {
     // do nothing game is not over
     // potentially invert this logic and encompass the relevant checks in the future
@@ -534,7 +550,7 @@ function delay (n) {
   })
 }
 
-async function LogGuess(data){
+async function LogGuess (data) {
   fetch('/Game/LogGuess', {
     method: 'post',
     headers: {
