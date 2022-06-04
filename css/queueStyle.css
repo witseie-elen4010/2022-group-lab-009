@@ -17,8 +17,18 @@
     justify-content: center;
   }
 
+  .QueueNames{
+    color: beige;
+    font-size: 300%;
+    border-radius: 20%;
+    border-color: burlywood;
+  }
+
   .name {
     text-align: center;
-    color: white;
+    color: beige;
+    border: 10% beige;
   }
+
+ 
   

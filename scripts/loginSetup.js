@@ -45,7 +45,15 @@ registerButton.addEventListener('click', function () {
       playerName: sessionStorage.getItem('userName'),
       userPassword: sessionStorage.getItem('userPassword')
     })
+  }).then((data)=> data.json()).then(data =>{
+    if(data == -1){
+      window.alert("Registration Failed Please, Either password was not value or name is already in use")
+    }else{
+      window.alert("Registration Sucessful!")
+    }
   })
+
+  
 })
 
 SubmitButton.addEventListener('click', function () {
