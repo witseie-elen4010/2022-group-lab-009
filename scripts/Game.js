@@ -2,11 +2,13 @@
 'use strict'
 let SafeCheck = true
 const WindowId = setInterval(update, 1000)
+const ForceFix = setInterval(GetSyncData,5000)
 let playerList = []
 let GM = ''
 let testWord = '!'
 let gameOver = false
 let hasWon = false;
+let canSubmit = true;
 
 window.addEventListener('beforeunload', function () {
   Dequeue()
@@ -156,28 +158,6 @@ async function GetHighScore(UID){
 
 }
 
-async function SetupHighScore(){
-  let playerList = []
-  fetch('Auth/ReturnPlayersScore').then(data => data.json()).then(data =>{
-    playerList = data
-    if(playerList.length == 0)
-    {
-      SetupHighScore()
-      return
-    }
-    playerList = playerList.filter((data) => {
-      if (data.UID !== sessionStorage.getItem('UID')) {
-        return data
-      }
-    })
-    playerList.forEach(player =>{
-        let temp = document.getElementById('#Score' + player.UID)
-        temp.innerHTML +=  " - " + player.Score;
-    })
-  })
-  
-}
-
 async function SetupOppBoard () {
   fetch('/Auth/ReturnPlayers').then((data) => {
     return data.json()
@@ -191,7 +171,18 @@ async function SetupOppBoard () {
     console.log('playerList: ', playerList)
     const opponentBoard = document.getElementById('playersGrid');
 
-    SetupHighScore()
+     fetch('Auth/ReturnPlayersScore').then(data => data.json()).then(data =>{
+      playerList = data
+      playerList = playerList.filter((data) => {
+        if (data.UID !== sessionStorage.getItem('UID')) {
+          return data
+        }
+      })
+      playerList.forEach(player =>{
+          let temp = document.getElementById('#Score' + player.UID)
+          temp.innerHTML = player.playerName + " - " + player.Score;
+      })
+    })
 
     for(let player of playerList){
       if (player.UID !== GM) {
@@ -238,6 +229,23 @@ async function SyncData (data) {
     })
 }
 
+async function LogGuess(data){
+  fetch('/Game/LogGuess', {
+    method: 'post',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      UID: sessionStorage.getItem('UID'),
+      WordID: data
+    })
+  })
+    .then((response) => {
+      console.log(response)
+    })
+}
+
 async function GetSyncData () {
   let temp = []
   fetch('Game/GetSync').then(data => data.json()).then((data) => {
@@ -269,7 +277,6 @@ async function GetSyncData () {
         const children = Array.from(container.children)
         console.log('children: ', children)
         children.forEach(element => {
-          console.log('We have ID:', element.id)
           if (element.id === slot.toString()) {
             element.style = `background-color:${Color}`
           }
@@ -289,7 +296,10 @@ document.addEventListener('DOMContentLoaded', () => {
           const key = target.getAttribute('value')
           // if entry isnt 5 letters
           if (key === 'Enter') {
-            submit()
+            if(canSubmit == true){
+              canSubmit = false;
+              submit()
+            }
             return
           }
 
@@ -382,14 +392,15 @@ async function submit () {
     if(data == -1){
       window.alert("Word Entered does not exist")
       notAWord = true;
+      canSubmit = true;
       return
-    }
-    else{
-      GuessID = data
+    }else{
+      GuessID = data;
     }
   })
 
   if(notAWord == true){
+    canSubmit = true;
     return;
   }
   console.log("Number 2");
@@ -412,12 +423,14 @@ async function submit () {
     })
     hasWon = true;
     gameOver = true;
+    canSubmit = true;
   }
   // check if game won
   //  && current !== testWord
   if (words.length === 6) {
     window.alert('Game-Over')
     window.alert(`Word of the day: ${testWord}`)
+    canSubmit = false;
   }
 
   // turn over tiles
@@ -466,6 +479,7 @@ async function submit () {
   SyncData(Data)
   LogGuess(GuessID)
   testWord = '!'
+  canSubmit = true;
 
   if (gameOver === true) {
     // Game over alert msg
@@ -517,6 +531,23 @@ function gridColourFunc (element, i) {
 
 function deleteKey () {
   const currentArr = currentWord()
+  switch(words.length){
+        case 0:
+          
+        break;
+        case 1:
+        break;
+        case 2:
+        break;
+        case 3:
+        break;
+        case 4:
+        break;
+        case 5:
+        break;
+        case 6:
+        break;
+  }
   const deleteElement = currentArr.pop() // remove letter
   console.log(deleteElement)
 
@@ -531,19 +562,5 @@ function deleteKey () {
 function delay (n) {
   return new Promise(function (resolve) {
     setTimeout(resolve, n * 1000)
-  })
-}
-
-async function LogGuess(data){
-  fetch('/Game/LogGuess', {
-    method: 'post',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      UID: sessionStorage.getItem('UID'),
-      WordID: data
-    })
   })
 }
