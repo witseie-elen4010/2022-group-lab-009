@@ -309,7 +309,8 @@ const GetActionLogTable = async () => {
   }
 }
 
-// GetMatchLogTable()
-// GetActionLogTable()
 
-module.exports = { RegisterPlayer, PlayerLogin, getRandomWord, IsLegalWord, IncrementStreak, ResetStreak, ViewHighScore, CreateMatch, LogPlayerAction, ViewMulipleHighScore, GetMatchLogTable, GetActionLogTable, DeletePlayerByID }
+//GetMatchLogTable()
+//GetActionLogTable()
+
+module.exports = { RegisterPlayer, PlayerLogin, getRandomWord, IsLegalWord, IncrementStreak, ResetStreak, ViewHighScore, CreateMatch, LogPlayerAction, ViewMulipleHighScore, GetMatchLogTable, GetActionLogTable, DeletePlayerByID}
