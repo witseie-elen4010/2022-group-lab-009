@@ -4,14 +4,15 @@ const Register = require('../scripts/dbInteraction')
 const UIDlib = require('../scripts/HashGen')
 const loginRouter = express.Router()
 
-loginRouter.post('/Register', function (req, res) {
+loginRouter.post('/Register', async function (req, res) {
   const tempName = req.body.playerName
   const tempPass = req.body.userPassword
   console.log('userName: ', tempName)
   console.log('PasswordL: ', tempPass)
   const HashPass = UIDlib.GenerateUniqueHash(tempPass)
   console.log('Hashed Pass: ', HashPass)
-  Register.RegisterPlayer(tempName, HashPass)
+  let response =  await Register.RegisterPlayer(tempName, HashPass)
+  res.json(response);
 })
 
 loginRouter.post('/Login', function (req, res) {

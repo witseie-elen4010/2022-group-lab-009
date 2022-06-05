@@ -55,7 +55,10 @@ async function GetAllQueued(){
         const List = document.getElementById("PlayerQueueList")
         List.innerHTML = "";
         PlayerList.forEach((data) =>{
-            List.innerHTML = List.innerHTML + '\n' +  data.playerName
+            const Player = document.createElement('div')
+            Player.innerHTML = data.playerName;
+            List.appendChild(Player);
+            //List.innerHTML = List.innerHTML + '\n' +  data.playerName
         })
       
     })
