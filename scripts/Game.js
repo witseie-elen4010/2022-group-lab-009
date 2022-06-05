@@ -1,14 +1,16 @@
 
 'use strict'
+
 let SafeCheck = true
-const WindowId = setInterval(update, 1000)
-const ForceFix = setInterval(GetSyncData,5000)
+
+const WindowId = setInterval(update, 500)
+// const ForceFix = setInterval(GetSyncData, 5000)
 let playerList = []
 let GM = ''
 let testWord = '!'
 let gameOver = false
-let hasWon = false;
-let canSubmit = true;
+let hasWon = false
+let canSubmit = true
 
 window.addEventListener('beforeunload', function () {
   Dequeue()
@@ -20,15 +22,18 @@ window.addEventListener('load', (event) => {
   CheckForReload()
   GetACK()
 })
+// GameStatus()
+// GetSyncData()
 
 function update () {
   GameStatus()
   GetSyncData()
+  // console.log('Can submit status ', canSubmit)
 }
 
 function CheckForReload () {
   const data = window.performance.getEntriesByType('navigation')[0].type
-  console.log(data)
+  // console.log(data)
   if (data === 'reload') {
     Dequeue()
     CloseSync()
@@ -137,7 +142,7 @@ async function CloseSync () {
   })
 }
 
-async function GetHighScore(UID){
+async function GetHighScore (UID) {
   let HighScore = 0
   fetch('/Game/PlayerHighScore', {
     method: 'post',
@@ -146,16 +151,15 @@ async function GetHighScore(UID){
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      UID: UID
+      UID
     })
   })
     .then((response) => {
-      return response.json();
-    }).then(data=>{
-      HighScore = data;
-      return HighScore;
+      return response.json()
+    }).then(data => {
+      HighScore = data
+      return HighScore
     })
-
 }
 
 async function SetupOppBoard () {
@@ -169,29 +173,29 @@ async function SetupOppBoard () {
       }
     })
     console.log('playerList: ', playerList)
-    const opponentBoard = document.getElementById('playersGrid');
+    const opponentBoard = document.getElementById('playersGrid')
 
-     fetch('Auth/ReturnPlayersScore').then(data => data.json()).then(data =>{
+    fetch('Auth/ReturnPlayersScore').then(data => data.json()).then(data => {
       playerList = data
       playerList = playerList.filter((data) => {
         if (data.UID !== sessionStorage.getItem('UID')) {
           return data
         }
       })
-      playerList.forEach(player =>{
-          let temp = document.getElementById('#Score' + player.UID)
-          temp.innerHTML = player.playerName + " - " + player.Score;
+      playerList.forEach(player => {
+        const temp = document.getElementById('#Score' + player.UID)
+        temp.innerHTML = player.playerName + ' - ' + player.Score
       })
     })
 
-    for(let player of playerList){
+    for (const player of playerList) {
       if (player.UID !== GM) {
         const container = document.createElement('div')
         container.setAttribute('id', '#' + player.UID)
         container.setAttribute('class', 'grid playerGridStyle')
         const heading = document.createElement('h2')
-        heading.setAttribute('id','#Score' + player.UID)
-        heading.innerHTML = player.playerName;
+        heading.setAttribute('id', '#Score' + player.UID)
+        heading.innerHTML = player.playerName
         heading.setAttribute('class', 'playerTitle')
         opponentBoard.appendChild(heading)
         console.log('x value: ', player)
@@ -201,14 +205,14 @@ async function SetupOppBoard () {
           grid.classList.add('flipping')
           grid.setAttribute('id', i + 1) // index starts at one not 0
           container.appendChild(grid)
-        }        
+        }
         opponentBoard.appendChild(container)
       }
     }
 
-   // playerList.forEach(data => {
-     
-    //})
+    // playerList.forEach(data => {
+
+    // })
   })
 }
 
@@ -226,10 +230,13 @@ async function SyncData (data) {
   })
     .then((response) => {
       console.log(response)
+      return response.json()
+    }).then((data) => {
+      console.log(data)
     })
 }
 
-async function LogGuess(data){
+async function LogGuess (data) {
   fetch('/Game/LogGuess', {
     method: 'post',
     headers: {
@@ -243,47 +250,83 @@ async function LogGuess(data){
   })
     .then((response) => {
       console.log(response)
+      return response.json()
+    }).then((data) => {
+      console.log(data)
     })
 }
 
 async function GetSyncData () {
   let temp = []
-  fetch('Game/GetSync').then(data => data.json()).then((data) => {
+  const controller = new AbortController()
+
+  // 5 second timeout:
+  // const timeoutId = setTimeout(() => controller.abort(), 5000)
+  // , { signal: controller.signal }
+  const a = fetch('Game/GetSync').then(data => data.json()).then((data) => {
     temp = data
     temp = temp.filter(element => {
       if (element.UID !== sessionStorage.getItem('UID')) {
         return element
       }
     })
-    console.log("Sync'd data: ", temp)
-    console.log('Our interest Syncs: ', temp.length)
+    // console.log("Sync'd data: ", temp)
+    // console.log('Our interest Syncs: ', temp.length)
     while (temp.length > 0) {
       const tempPlayer = temp[0].UID
       console.log('Current PlayerID: ', tempPlayer)
       const PlayerMoves = temp.filter(element => {
         if (element.UID === tempPlayer) {
+          console.log('HERE')
           return element
         }
       })
       temp = temp.filter(element => {
         if (element.UID !== tempPlayer) {
+          console.log('HERE 2')
           return element
         }
       })
+      console.log('HERE 3')
       const container = document.getElementById('#' + tempPlayer)
       PlayerMoves.forEach((data) => {
         const slot = data.Moves.idLetter
-        const Color = data.Moves.gridColour
+        let colour = ''
+        // console.log(data.Moves.gridColour)
+        console.log('HERE 4')
+        switch (data.Moves.colour) {
+          case 'w':
+            colour = 'rgb(58, 58, 60)' // grey
+            // data.Moves.gridColour = 'grey'
+            break
+
+          case 'g':
+            colour = 'rgb(83, 141, 78)'// green
+            // data.Moves.gridColour = 'green'
+            break
+
+          case 'y':
+            colour = 'rgb(181, 159, 59)' // yellow
+            // data.Moves.gridColour = 'yellow'
+            break
+        }
+        // console.log(data.Moves.gridColour)
+        // console.log('The colour code is ', colour)
+        console.log('HERE 5')
         const children = Array.from(container.children)
-        console.log('children: ', children)
+        // console.log('children: ', children)
         children.forEach(element => {
           if (element.id === slot.toString()) {
-            element.style = `background-color:${Color}`
+            console.log('HERE 6')
+            // element.style.backgroundColor = data.Moves.gridColour
+            // element.style.backgroundColor = colour
+            element.style = `background-color:${colour}`
           }
         })
       })
     }
   })
+  console.log(a)
 }
 
 /// Game Functionality section
@@ -296,8 +339,8 @@ document.addEventListener('DOMContentLoaded', () => {
           const key = target.getAttribute('value')
           // if entry isnt 5 letters
           if (key === 'Enter') {
-            if(canSubmit == true){
-              canSubmit = false;
+            if (canSubmit == true) {
+              canSubmit = false
               submit()
             }
             return
@@ -368,16 +411,19 @@ async function GetWord () {
 }
 
 async function submit () {
+  GetSyncData()
   const currentArr = currentWord()
   if (currentArr.length !== 5) {
     window.alert('5 letters')
+    canSubmit = true
+    return
   }
   const current = currentArr.join('')
   console.log(current.toLowerCase())
 
   GetWord()
-  let notAWord = false;
-  let GuessID = -1;
+  let notAWord = false
+  let GuessID = -1
   await fetch('/Game/CheckWord', {
     method: 'post',
     headers: {
@@ -387,23 +433,22 @@ async function submit () {
     body: JSON.stringify({
       Word: current
     })
-  }).then(data => data.json()).then(data =>{
-    console.log("Number 1");
-    if(data == -1){
-      window.alert("Word Entered does not exist")
-      notAWord = true;
-      canSubmit = true;
-      return
-    }else{
-      GuessID = data;
+  }).then(data => data.json()).then(data => {
+    console.log('Number 1')
+    if (data == -1) {
+      window.alert('Word Entered does not exist')
+      notAWord = true
+      canSubmit = true
+    } else {
+      GuessID = data
     }
   })
 
-  if(notAWord == true){
-    canSubmit = true;
-    return;
+  if (notAWord == true) {
+    canSubmit = true
+    return
   }
-  console.log("Number 2");
+  console.log('Number 2')
   // game won
   console.log('Word to Guess: ', testWord)
   console.log('Word Guessed: ', current)
@@ -421,16 +466,16 @@ async function submit () {
         UID: sessionStorage.getItem('UID')
       })
     })
-    hasWon = true;
-    gameOver = true;
-    canSubmit = true;
+    hasWon = true
+    gameOver = true
+    canSubmit = true
   }
   // check if game won
   //  && current !== testWord
   if (words.length === 6) {
     window.alert('Game-Over')
     window.alert(`Word of the day: ${testWord}`)
-    canSubmit = false;
+    canSubmit = false
   }
 
   // turn over tiles
@@ -441,9 +486,29 @@ async function submit () {
   currentArr.forEach((element, i) => {
     const gridColour = gridColourFunc(element, i)
     const idLetter = idCount + i
-    const temp = { idLetter, gridColour }
+    // const temp = { idLetter, gridColour }
+    let colour = ' '
+    switch (gridColour) {
+      case 'rgb(58, 58, 60)':
+        colour = 'w' // grey
+
+        break
+
+      case 'rgb(83, 141, 78)':
+        colour = 'g' // green
+
+        break
+
+      case 'rgb(181, 159, 59)':
+        colour = 'y' // yellow
+
+        break
+    }
+    const temp = { idLetter, colour }
+    console.log(colour)
     Data.push(temp)
   })
+
   // Animation
   idCount = count * 5 + 1
   timer = 300
@@ -462,7 +527,24 @@ async function submit () {
   const container = document.getElementById('grid')
   Data.forEach((data) => {
     const slot = data.idLetter
-    const Color = data.gridColour
+    let Color = data.colour
+    switch (Color) {
+      case 'w':
+        Color = 'rgb(58, 58, 60)' // grey
+        // Color = 'grey'
+        break
+
+      case 'g':
+        Color = 'rgb(83, 141, 78)'// green
+        // Color = 'green'
+        break
+
+      case 'y':
+        Color = 'rgb(181, 159, 59)' // yellow
+        // Color = 'yellow'
+        break
+    }
+
     const children = Array.from(container.children)
     children.forEach(element => {
       if (element.id === slot.toString()) {
@@ -479,16 +561,16 @@ async function submit () {
   SyncData(Data)
   LogGuess(GuessID)
   testWord = '!'
-  canSubmit = true;
+  canSubmit = true
 
   if (gameOver === true) {
     // Game over alert msg
     window.alert('A player has won the game. A new game will now begin')
-    if(hasWon == true){
+    if (hasWon == true) {
       Dequeue()
       CloseSync()
       ClearGameMode()
-    }else if(hasWon == false){
+    } else if (hasWon == false) {
       fetch('/Game/EndStreak', {
         method: 'post',
         headers: {
@@ -499,12 +581,11 @@ async function submit () {
           UID: sessionStorage.getItem('UID')
         })
       })
-      window.alert("You Lose! hahah streak bye bye")
-      Dequeue();
+      window.alert('You Lose! hahah streak bye bye')
+      Dequeue()
       CloseSync()
       ClearGameMode()
     }
-    
   } else {
     // do nothing game is not over
     // potentially invert this logic and encompass the relevant checks in the future
@@ -530,33 +611,38 @@ function gridColourFunc (element, i) {
 }
 
 function deleteKey () {
+  // dependant on number of words ==> dynamically find latest word
   const currentArr = currentWord()
-  switch(words.length){
-        case 0:
-          
-        break;
-        case 1:
-        break;
-        case 2:
-        break;
-        case 3:
-        break;
-        case 4:
-        break;
-        case 5:
-        break;
-        case 6:
-        break;
+  switch (words.length) {
+    case 0:
+
+      break
+    case 1:
+      break
+    case 2:
+      break
+    case 3:
+      break
+    case 4:
+      break
+    case 5:
+      break
+    case 6:
+      break
   }
-  const deleteElement = currentArr.pop() // remove letter
-  console.log(deleteElement)
+  if (space - 1 > (words.length - 1) * 5) {
+    const deleteElement = currentArr.pop() // remove letter
+    console.log(deleteElement)
 
-  words[words.length - 1] = currentArr
+    words[words.length - 1] = currentArr
 
-  const lastElement = document.getElementById(String(space - 1))
+    const lastElement = document.getElementById(String(space - 1))
 
-  lastElement.textContent = ''
-  space = space - 1
+    lastElement.textContent = ''
+    space = space - 1
+  } else {
+
+  }
 }
 
 function delay (n) {
