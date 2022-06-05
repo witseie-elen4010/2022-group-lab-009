@@ -13,17 +13,20 @@ document.onload = () => {
   sessionStorage.setItem('userPassword', '')
 }
 
-logsButton.addEventListener('click', function(){
+logsButton.addEventListener('click', function () {
   fetch('/Logs/ViewLogs').then((data) => {
     window.location.replace(data.url)
   })
 })
 
 registerButton.addEventListener('click', function () {
+  registerBtn = document.getElementById('registerSubmit')
+  registerBtn.disabled = true
   const playerUserPassword = sessionStorage.getItem('userPassword')
   const playerUserName = sessionStorage.getItem('userName')
   if (playerUserName.length < 3) {
     window.alert('UserName To Short, requires atleast 3 characters')
+    registerBtn.disabled = false
     return
   }
   // assigning a temp variable to check the userPassword
@@ -31,6 +34,7 @@ registerButton.addEventListener('click', function () {
   // Placing checks for UserPassword length here, can place additional checks here
   if (playerUserPassword.length < 3) {
     window.alert('Password To Short, requires atleast 3 characters')
+    registerBtn.disabled = false
     return
   }
 
@@ -45,23 +49,26 @@ registerButton.addEventListener('click', function () {
       playerName: sessionStorage.getItem('userName'),
       userPassword: sessionStorage.getItem('userPassword')
     })
-  }).then((data)=> data.json()).then(data =>{
-    if(data == -1){
-      window.alert("Registration Failed Please, Either password was not value or name is already in use")
-    }else{
-      window.alert("Registration Sucessful!")
+  }).then((data) => data.json()).then(data => {
+    if (data == -1) {
+      window.alert('Registration Failed Please, Either password was not value or name is already in use')
+      registerBtn.disabled = false
+    } else {
+      window.alert('Registration Sucessful!')
+      registerBtn.disabled = false
     }
   })
-
-  
 })
 
 SubmitButton.addEventListener('click', function () {
+  submitBtn = document.getElementById('LoginSubmit')
+  submitBtn.disabled = true
   // assigning a temp variable to check the username
   const playerUserName = sessionStorage.getItem('userName')
   // Placing checks for username length here, can place additional checks here
   if (playerUserName.length < 3) {
     window.alert('UserName To Short, requires atleast 3 characters')
+    submitBtn.disabled = false
     return
   }
   // assigning a temp variable to check the userPassword
@@ -69,6 +76,7 @@ SubmitButton.addEventListener('click', function () {
   // Placing checks for UserPassword length here, can place additional checks here
   if (playerUserPassword.length < 3) {
     window.alert('Password To Short, requires atleast 3 characters')
+    submitBtn.disabled = false
     return
   }
   // Requires DB interation here to check the username and password authenticity
@@ -93,6 +101,7 @@ SubmitButton.addEventListener('click', function () {
     console.log('data: ', data)
     if (data.includes('FAILED')) {
       window.alert('login Failed')
+      submitBtn.disabled = false
     } else {
       console.log('ID:', data)
       tempUID = data
@@ -126,9 +135,11 @@ SubmitButton.addEventListener('click', function () {
             .then((response) => {
               console.log(response)
               window.location.replace(response.url)
+              submitBtn.disabled = false
             })
         } else if (data === false) { // if  you cant join the queue system wait
           window.alert('Cannot Join, Game is already in progress')
+          submitBtn.disabled = false
         }
       })
     }

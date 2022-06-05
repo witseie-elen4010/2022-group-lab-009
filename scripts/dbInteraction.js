@@ -108,7 +108,7 @@ const getRandomWord = async () => {
 
     const randomWord = await ConnectAndExecute(sqlCom)
 
-    let temp = {Word:randomWord[0][1], WordID:randomWordID}
+    const temp = { Word: randomWord[0][1], WordID: randomWordID }
 
     return temp
   } catch (err) {
@@ -169,7 +169,7 @@ const PlayerLogin = async (accountName, hashedPassword) => {
 }
 
 const DeletePlayerByID = async (accountID) => {
-  try{
+  try {
     const sqlCom = 'DELETE FROM [dbo].[player_account] OUTPUT DELETED.[id] WHERE id = ' + accountID.toString()
 
     console.log(sqlCom)
@@ -177,7 +177,7 @@ const DeletePlayerByID = async (accountID) => {
     const result = await ConnectAndExecute(sqlCom)
 
     return result
-  }catch(err){
+  } catch (err) {
     console.log(err)
   }
 }
@@ -231,13 +231,10 @@ const ViewMulipleHighScore = async (playerID) => {
   try {
     sqlCondition = ''
 
-    for(let i = 0; i < playerID.length; i++)
-    {
-      if(i+1 != playerID.length)
-      {
+    for (let i = 0; i < playerID.length; i++) {
+      if (i + 1 != playerID.length) {
         sqlCondition = sqlCondition + ' [id] = ' + playerID[i].toString() + ' OR'
-      }
-      else{
+      } else {
         sqlCondition = sqlCondition + ' [id] = ' + playerID[i].toString()
       }
     }
@@ -246,19 +243,17 @@ const ViewMulipleHighScore = async (playerID) => {
 
     console.log(sqlCom)
 
-    let playerHighScore = await ConnectAndExecute(sqlCom)
+    const playerHighScore = await ConnectAndExecute(sqlCom)
 
-    let result = []
+    const result = []
 
-    for(let i = 0; i < playerID.length; i++)
-    {
-      let temp = {UID: playerHighScore[2*i][1], Score: playerHighScore[2*i+1][1]}
+    for (let i = 0; i < playerID.length; i++) {
+      const temp = { UID: playerHighScore[2 * i][1], Score: playerHighScore[2 * i + 1][1] }
 
       result.push(temp)
     }
 
     return result
-
   } catch (err) {
     console.log(err)
   }
@@ -288,20 +283,20 @@ const LogPlayerAction = async (matchID, playerID, attemptWordID, attemptDateTime
   }
 }
 
-const GetMatchLogTable = async() => {
-  try{
+const GetMatchLogTable = async () => {
+  try {
     const sqlCom = 'SELECT m.[id], game_mode, word as correct_word, match_date FROM [dbo].[match_log] as m LEFT JOIN wordle_word as w ON m.word_id = w.id'
 
     const table = await ConnectAndExecute(sqlCom)
 
     return table
-  }catch(err){
+  } catch (err) {
     console.log(err)
   }
 }
 
-const GetActionLogTable = async() => {
-  try{
+const GetActionLogTable = async () => {
+  try {
     const sqlCom = 'SELECT [match_id],[player_account_name] as playe_name,[word] as Guess_Word,[attempted_datetime] FROM [dbo].[action_log] as a LEFT JOIN player_account as p ON a.player_id = p.id LEFT JOIN wordle_word as w ON a.word_id = w.id'
 
     const table = await ConnectAndExecute(sqlCom)
@@ -309,16 +304,12 @@ const GetActionLogTable = async() => {
     console.log(table)
 
     return table
-  }catch(err){
+  } catch (err) {
     console.log(err)
   }
 }
 
-DeletePlayerByID(9).then((result) =>{
-  console.log(result)
-})
+// GetMatchLogTable()
+// GetActionLogTable()
 
-//GetMatchLogTable()
-//GetActionLogTable()
-
-module.exports = { RegisterPlayer, PlayerLogin, getRandomWord, IsLegalWord, IncrementStreak, ResetStreak, ViewHighScore, CreateMatch, LogPlayerAction, ViewMulipleHighScore, GetMatchLogTable, GetActionLogTable, DeletePlayerByID}
+module.exports = { RegisterPlayer, PlayerLogin, getRandomWord, IsLegalWord, IncrementStreak, ResetStreak, ViewHighScore, CreateMatch, LogPlayerAction, ViewMulipleHighScore, GetMatchLogTable, GetActionLogTable, DeletePlayerByID }
