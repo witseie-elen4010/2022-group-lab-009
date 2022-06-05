@@ -1,8 +1,9 @@
 
 'use strict'
+
 let SafeCheck = true
 
-const WindowId = setInterval(update, 2000)
+const WindowId = setInterval(update, 500)
 // const ForceFix = setInterval(GetSyncData, 5000)
 let playerList = []
 let GM = ''
@@ -21,12 +22,12 @@ window.addEventListener('load', (event) => {
   CheckForReload()
   GetACK()
 })
-GameStatus()
-GetSyncData()
+// GameStatus()
+// GetSyncData()
 
 function update () {
-  // GameStatus()
-  // GetSyncData()
+  GameStatus()
+  GetSyncData()
   // console.log('Can submit status ', canSubmit)
 }
 
@@ -115,7 +116,7 @@ async function GameStatus () {
         window.location.replace(data)
       })
     }
-  }).then(() => { GameStatus() })
+  })
 }
 
 async function Dequeue () {
@@ -229,6 +230,9 @@ async function SyncData (data) {
   })
     .then((response) => {
       console.log(response)
+      return response.json()
+    }).then((data) => {
+      console.log(data)
     })
 }
 
@@ -246,12 +250,20 @@ async function LogGuess (data) {
   })
     .then((response) => {
       console.log(response)
+      return response.json()
+    }).then((data) => {
+      console.log(data)
     })
 }
 
 async function GetSyncData () {
   let temp = []
-  fetch('Game/GetSync').then(data => data.json()).then((data) => {
+  const controller = new AbortController()
+
+  // 5 second timeout:
+  // const timeoutId = setTimeout(() => controller.abort(), 5000)
+  // , { signal: controller.signal }
+  const a = fetch('Game/GetSync').then(data => data.json()).then((data) => {
     temp = data
     temp = temp.filter(element => {
       if (element.UID !== sessionStorage.getItem('UID')) {
@@ -262,22 +274,26 @@ async function GetSyncData () {
     // console.log('Our interest Syncs: ', temp.length)
     while (temp.length > 0) {
       const tempPlayer = temp[0].UID
-      // console.log('Current PlayerID: ', tempPlayer)
+      console.log('Current PlayerID: ', tempPlayer)
       const PlayerMoves = temp.filter(element => {
         if (element.UID === tempPlayer) {
+          console.log('HERE')
           return element
         }
       })
       temp = temp.filter(element => {
         if (element.UID !== tempPlayer) {
+          console.log('HERE 2')
           return element
         }
       })
+      console.log('HERE 3')
       const container = document.getElementById('#' + tempPlayer)
       PlayerMoves.forEach((data) => {
         const slot = data.Moves.idLetter
         let colour = ''
         // console.log(data.Moves.gridColour)
+        console.log('HERE 4')
         switch (data.Moves.colour) {
           case 'w':
             colour = 'rgb(58, 58, 60)' // grey
@@ -296,10 +312,12 @@ async function GetSyncData () {
         }
         // console.log(data.Moves.gridColour)
         // console.log('The colour code is ', colour)
+        console.log('HERE 5')
         const children = Array.from(container.children)
         // console.log('children: ', children)
         children.forEach(element => {
           if (element.id === slot.toString()) {
+            console.log('HERE 6')
             // element.style.backgroundColor = data.Moves.gridColour
             // element.style.backgroundColor = colour
             element.style = `background-color:${colour}`
@@ -307,7 +325,8 @@ async function GetSyncData () {
         })
       })
     }
-  }).then(() => { GetSyncData() })
+  })
+  console.log(a)
 }
 
 /// Game Functionality section

@@ -59,7 +59,7 @@ gameRouter.post('/Sync', function (req, res) {
     const temp = { UID: req.body.UID, Moves: element }
     SyncList.push(temp)
   })
-
+  res.json('Done')
   console.log('SyncList: ', SyncList)
 })
 
@@ -133,6 +133,7 @@ gameRouter.get('/GetGameMode', function (req, res) {
 
 gameRouter.post('/LogGuess', function (req, res) {
   DB.LogPlayerAction(matchID, req.body.UID, req.body.WordID, dateFormat.formatDate(new Date()))
+  res.json('Log Done')
 })
 
 module.exports = gameRouter
