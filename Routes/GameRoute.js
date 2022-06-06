@@ -71,10 +71,12 @@ gameRouter.post('/CheckWord', function (req, res) {
 
 gameRouter.post('/IncreaseScore', function (req, res) {
   DB.IncrementStreak(req.body.UID)
+  res.json('Done')
 })
 
 gameRouter.post('/EndStreak', function (req, res) {
   DB.ResetStreak(req.body.UID)
+  res.json('Done')
 })
 
 gameRouter.post('/PlayerHighScore', function (req, res) {
@@ -121,6 +123,7 @@ gameRouter.post('/ClearGameMode', function (req, res) {
   GMUID = ''
   gameWord = ''
   counter = 0
+  res.json('Done')
 })
 
 gameRouter.get('/GetGameMode', function (req, res) {

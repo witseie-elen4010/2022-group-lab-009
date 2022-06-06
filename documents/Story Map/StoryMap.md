@@ -1,0 +1,5 @@
+# Story Map Justification
+
+Due to the fact that the development team is inexperienced within the context of story map driven development, there are two story maps provided. The first story map details what the initial expectations were for the project, but like all software projects requirements and extra details were discovered during development that had to be addressed. This altered the story board after the commencement of development. Thus, a retrospective user story map board was uploaded at the end of the project development which showcases all the actual user stories completed in all of the sprints throughout the development.
+
+From this experience the development has learnt skills related to story map driven development. Alot of the challenges faced in the initial sprints were addressed during later sprints. The development team now understands the power of story map driven development, were as initially the benefits were seen as ambigous. The power of story map driven development is to provide a user driven development style, which helps developers address core user issues during all aspects of development.  

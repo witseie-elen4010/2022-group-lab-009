@@ -22,18 +22,14 @@ window.addEventListener('load', (event) => {
   CheckForReload()
   GetACK()
 })
-// GameStatus()
-// GetSyncData()
 
 function update () {
   GameStatus()
   GetSyncData()
-  // console.log('Can submit status ', canSubmit)
 }
 
 function CheckForReload () {
   const data = window.performance.getEntriesByType('navigation')[0].type
-  // console.log(data)
   if (data === 'reload') {
     Dequeue()
     CloseSync()
@@ -57,7 +53,6 @@ async function ClearGameMode () {
 
 async function CheckGameMode () {
   fetch('/Game/GetGameMode').then(data => data.json()).then(data => {
-    console.log('Player is GM: ', data.UID)
     gridSystem()
     if (data.gameMode === true && data.UID === sessionStorage.getItem('UID')) {
       const playerGrid = document.getElementById('grid')
@@ -65,7 +60,6 @@ async function CheckGameMode () {
       playerGrid.remove()
       PlayerKeyBoard.remove()
       SafeCheck = false
-      console.log('grid Destroyed')
     } else if (data.gameMode === true && data.UID !== sessionStorage.getItem('UID')) {
       GM = data.UID
     }
@@ -85,11 +79,8 @@ function GetACK () {
     })
   })
     .then((response) => {
-      console.log(response)
       return response.json()
     }).then((data) => {
-      console.log('Here is our response')
-      console.log(data)
       if (data.includes('Sucess!')) {
         console.log('Connected')
       } else {
@@ -172,7 +163,6 @@ async function SetupOppBoard () {
         return data
       }
     })
-    console.log('playerList: ', playerList)
     const opponentBoard = document.getElementById('playersGrid')
 
     fetch('Auth/ReturnPlayersScore').then(data => data.json()).then(data => {
@@ -183,8 +173,12 @@ async function SetupOppBoard () {
         }
       })
       playerList.forEach(player => {
-        const temp = document.getElementById('#Score' + player.UID)
-        temp.innerHTML = player.playerName + ' - ' + player.Score
+        try {
+          const temp = document.getElementById('#Score' + player.UID)
+          temp.innerHTML = player.playerName + ' - ' + player.Score
+        } catch (error) {
+          // Do nothing
+        }
       })
     })
 
@@ -198,7 +192,6 @@ async function SetupOppBoard () {
         heading.innerHTML = player.playerName
         heading.setAttribute('class', 'playerTitle')
         opponentBoard.appendChild(heading)
-        console.log('x value: ', player)
         for (let i = 0; i < 30; i++) {
           const grid = document.createElement('div')
           grid.classList.add('col-sm-3')
@@ -209,10 +202,6 @@ async function SetupOppBoard () {
         opponentBoard.appendChild(container)
       }
     }
-
-    // playerList.forEach(data => {
-
-    // })
   })
 }
 
@@ -229,7 +218,6 @@ async function SyncData (data) {
     })
   })
     .then((response) => {
-      console.log(response)
       return response.json()
     }).then((data) => {
       console.log(data)
@@ -249,7 +237,6 @@ async function LogGuess (data) {
     })
   })
     .then((response) => {
-      console.log(response)
       return response.json()
     }).then((data) => {
       console.log(data)
@@ -258,75 +245,51 @@ async function LogGuess (data) {
 
 async function GetSyncData () {
   let temp = []
-  const controller = new AbortController()
-
-  // 5 second timeout:
-  // const timeoutId = setTimeout(() => controller.abort(), 5000)
-  // , { signal: controller.signal }
-  const a = fetch('Game/GetSync').then(data => data.json()).then((data) => {
+  fetch('Game/GetSync').then(data => data.json()).then((data) => {
     temp = data
     temp = temp.filter(element => {
       if (element.UID !== sessionStorage.getItem('UID')) {
         return element
       }
     })
-    // console.log("Sync'd data: ", temp)
-    // console.log('Our interest Syncs: ', temp.length)
     while (temp.length > 0) {
       const tempPlayer = temp[0].UID
-      console.log('Current PlayerID: ', tempPlayer)
       const PlayerMoves = temp.filter(element => {
         if (element.UID === tempPlayer) {
-          console.log('HERE')
           return element
         }
       })
       temp = temp.filter(element => {
         if (element.UID !== tempPlayer) {
-          console.log('HERE 2')
           return element
         }
       })
-      console.log('HERE 3')
       const container = document.getElementById('#' + tempPlayer)
       PlayerMoves.forEach((data) => {
         const slot = data.Moves.idLetter
         let colour = ''
-        // console.log(data.Moves.gridColour)
-        console.log('HERE 4')
         switch (data.Moves.colour) {
           case 'w':
             colour = 'rgb(58, 58, 60)' // grey
-            // data.Moves.gridColour = 'grey'
             break
 
           case 'g':
             colour = 'rgb(83, 141, 78)'// green
-            // data.Moves.gridColour = 'green'
             break
 
           case 'y':
             colour = 'rgb(181, 159, 59)' // yellow
-            // data.Moves.gridColour = 'yellow'
             break
         }
-        // console.log(data.Moves.gridColour)
-        // console.log('The colour code is ', colour)
-        console.log('HERE 5')
         const children = Array.from(container.children)
-        // console.log('children: ', children)
         children.forEach(element => {
           if (element.id === slot.toString()) {
-            console.log('HERE 6')
-            // element.style.backgroundColor = data.Moves.gridColour
-            // element.style.backgroundColor = colour
             element.style = `background-color:${colour}`
           }
         })
       })
     }
   })
-  console.log(a)
 }
 
 /// Game Functionality section
@@ -351,8 +314,6 @@ document.addEventListener('DOMContentLoaded', () => {
             deleteKey()
             return
           }
-
-          console.log(key)
           WordUpdate(key)
         }
       }
@@ -405,7 +366,6 @@ async function GetWord () {
   fetch('/Game/GetWord').then((data) => {
     return data.json()
   }).then((data) => {
-    console.log('word from server: ', data)
     testWord = data.trim().toUpperCase()
   })
 }
@@ -419,7 +379,6 @@ async function submit () {
     return
   }
   const current = currentArr.join('')
-  console.log(current.toLowerCase())
 
   GetWord()
   let notAWord = false
@@ -434,7 +393,6 @@ async function submit () {
       Word: current
     })
   }).then(data => data.json()).then(data => {
-    console.log('Number 1')
     if (data == -1) {
       window.alert('Word Entered does not exist')
       notAWord = true
@@ -448,10 +406,7 @@ async function submit () {
     canSubmit = true
     return
   }
-  console.log('Number 2')
   // game won
-  console.log('Word to Guess: ', testWord)
-  console.log('Word Guessed: ', current)
   if (current === testWord) {
     window.alert('Correct')
     // Set a game over boolean to true
@@ -505,23 +460,12 @@ async function submit () {
         break
     }
     const temp = { idLetter, colour }
-    console.log(colour)
     Data.push(temp)
   })
 
   // Animation
   idCount = count * 5 + 1
   timer = 300
-  // currentArr.forEach((element, i) => {
-  // setTimeout(() => {
-  // const gridColour = gridColourFunc(element, i)
-  // const idLetter = idCount + i
-  // const elementLetter = document.getElementById(idLetter)
-  // elementLetter.classList.add('animate__flipInX')
-  // elementLetter.style = `background-color:${gridColour}`
-  // }, timer * i) // extend interval in each letter
-  // })
-  // await delay(1.5)
 
   const tempPlayer = sessionStorage.getItem('UID')
   const container = document.getElementById('grid')
@@ -531,17 +475,14 @@ async function submit () {
     switch (Color) {
       case 'w':
         Color = 'rgb(58, 58, 60)' // grey
-        // Color = 'grey'
         break
 
       case 'g':
         Color = 'rgb(83, 141, 78)'// green
-        // Color = 'green'
         break
 
       case 'y':
         Color = 'rgb(181, 159, 59)' // yellow
-        // Color = 'yellow'
         break
     }
 
@@ -556,8 +497,6 @@ async function submit () {
   count += 1
   // next row
   words.push([])
-  console.log('What we passing to sync: ', Data)
-  console.log('After String: ', JSON.stringify(Data))
   SyncData(Data)
   LogGuess(GuessID)
   testWord = '!'
@@ -588,7 +527,6 @@ async function submit () {
     }
   } else {
     // do nothing game is not over
-    // potentially invert this logic and encompass the relevant checks in the future
   }
 }
 
@@ -613,23 +551,7 @@ function gridColourFunc (element, i) {
 function deleteKey () {
   // dependant on number of words ==> dynamically find latest word
   const currentArr = currentWord()
-  switch (words.length) {
-    case 0:
 
-      break
-    case 1:
-      break
-    case 2:
-      break
-    case 3:
-      break
-    case 4:
-      break
-    case 5:
-      break
-    case 6:
-      break
-  }
   if (space - 1 > (words.length - 1) * 5) {
     const deleteElement = currentArr.pop() // remove letter
     console.log(deleteElement)
@@ -641,7 +563,7 @@ function deleteKey () {
     lastElement.textContent = ''
     space = space - 1
   } else {
-
+    // Do nothing
   }
 }
 
