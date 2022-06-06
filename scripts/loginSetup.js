@@ -148,12 +148,10 @@ SubmitButton.addEventListener('click', function () {
 
 playerUserNameInput.addEventListener('input', function () {
   sessionStorage.setItem('userName', playerUserNameInput.value)
-  console.log('Saved: ' + sessionStorage.getItem('userName'))
   // GenerateUniqueHash(sessionStorage.getItem("userName"))
 })
 
 playerUserPasswordInput.addEventListener('input', function () {
   sessionStorage.setItem('userPassword', playerUserPasswordInput.value)
-  console.log('Saved: ' + sessionStorage.getItem('userPassword'))
   // GenerateUniqueHash(sessionStorage.getItem("userPassword"))
 })
