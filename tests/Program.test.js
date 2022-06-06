@@ -4,6 +4,7 @@ const express = require("express");
 let app = require("../index")
 const UIDLib = require('../scripts/HashGen')
 const DB = require("../scripts/dbInteraction")
+const DateFormat = require("../scripts/DateFormat")
 
 beforeAll(() =>{
   app.close();
@@ -217,6 +218,50 @@ describe('Database Test', function() {
     await DB.DeletePlayerByID(registeredID)
 
     expect(registeredID).toBe(logInID)
+  })
+})
+
+describe('Database Test', function() {
+  jest.setTimeout(15000);
+  test('Admin highscore should not be 0', async () =>{
+    const testAccount = 'admin'
+    const testPassword = 'admin'
+
+    const logInID = await DB.PlayerLogin(testAccount, testPassword)
+
+    const highScore = await DB.ViewHighScore(logInID)
+
+    expect(highScore).not.toBe(0)
+  })
+})
+
+describe('Database Test', function() {
+  jest.setTimeout(15000);
+  test('Test account high score is incremented', async () =>{
+    const testAccount = 'TestHighScoreAccount'
+    const testPassword = 'HashedPassword'
+
+    const logInID = await DB.PlayerLogin(testAccount, testPassword)
+
+    const highScore = await DB.ViewHighScore(logInID)
+
+    await DB.IncrementStreak(logInID)
+
+    const incrementHighScore = await DB.ViewHighScore(logInID)
+
+    expect(highScore < incrementHighScore).toBe(true)
+  })
+})
+
+//==============================================================================\\
+//DataFormat Tests
+//==============================================================================\\
+
+describe('Date Format Test', function(){
+  test('Format Dates to Database input', async() =>{
+    const testDate = new Date('May 30, 2022 05:40:03')
+
+    expect(DateFormat.formatDate(testDate)).toBe("2022-05-30 05:40:03")
   })
 })
 
